@@ -8,117 +8,258 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>PDFMaster - Vibrant PDF Tools</title>
+  <title>PDFMaster - Your all-in-one solution for PDF management</title>
 
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/output.css">
 
 </head>
 
-<body class="bg-gray-100 text-gray-800 min-h-screen">
+<body class="bg-gray-100 min-h-screen">
 
-  <!-- Top Navigation -->
+  <!-- Header -->
 
-  <nav class="bg-teal-600 text-white p-4 flex justify-around items-center">
+  <header class="bg-wine-700 text-white p-4 text-center">
 
-    <h1 class="text-xl font-bold">PDFMaster</h1>
+    <h1 class="text-4xl font-bold">PDFMaster</h1>
 
-    <div class="space-x-4">
+    <p class="text-lg mt-2">Your all-in-one solution for PDF management.</p>
 
-      <button id="darkModeToggle" class="bg-coral-500 px-2 py-1 rounded">Toggle Dark Mode</button>
+    <nav class="mt-4 space-x-4">
 
-      <a href="#summarize" class="hover:underline">Summarize</a>
+      <a href="#summarize" class="hover:underline text-wine-200">Summarize & Chat</a>
 
-      <a href="#merge" class="hover:underline">Merge</a>
+      <a href="#merge" class="hover:underline text-wine-200">Merge</a>
 
-      <a href="#split" class="hover:underline">Split</a>
+      <a href="#split" class="hover:underline text-wine-200">Split</a>
 
-      <a href="#compress" class="hover:underline">Compress</a>
+      <a href="#compress" class="hover:underline text-wine-200">Compress</a>
 
-      <a href="#pdf-to-word" class="hover:underline">PDF to Word</a>
+      <a href="#convert" class="hover:underline text-wine-200">Convert</a>
 
-      <a href="#word-to-pdf" class="hover:underline">Word to PDF</a>
+    </nav>
 
-    </div>
-
-  </nav>
+  </header>
 
 
   <!-- Main Content -->
 
-  <main class="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+  <main class="p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-7xl mx-auto">
 
-    <section id="summarize" class="bg-white p-3 rounded-lg shadow hover:shadow-md transition">
+    <section id="summarize" class="bg-white p-4 rounded-lg shadow">
 
-      <h2 class="text-lg font-semibold mb-2 text-teal-600">Summarize & Chat</h2>
+      <div class="flex items-center mb-2">
+
+        <div class="bg-wine-100 p-2 rounded-full mr-2">
+
+          <svg class="w-6 h-6 text-wine-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+
+          </svg>
+
+        </div>
+
+        <h2 class="text-xl font-semibold text-wine-700">Summarize & Chat</h2>
+
+      </div>
+
+      <p class="text-gray-600 mb-4">Use AI to summarize and ask questions about your PDF documents.</p>
 
       <input type="file" id="summarizeFile" accept=".pdf" class="mb-2">
 
-      <button onclick="handleSummarize()" class="bg-yellow-500 text-white px-3 py-1 rounded">Process</button>
+      <button onclick="handleSummarize()" class="bg-wine-700 text-white px-4 py-2 rounded hover:bg-wine-800">Process</button>
 
-      <div id="summarizeResult" class="mt-2 text-sm"></div>
+      <div id="summarizeResult" class="mt-2 text-sm">
+
+        <div class="message-text">Processing...</div>
+
+        <div class="thinking-indicator">
+
+          <span class="text-wine-700"></span>
+
+          <span class="text-wine-700"></span>
+
+          <span class="text-wine-700"></span>
+
+        </div>
+
+      </div>
 
     </section>
 
 
-    <section id="merge" class="bg-white p-3 rounded-lg shadow hover:shadow-md transition">
+    <section id="merge" class="bg-white p-4 rounded-lg shadow">
 
-      <h2 class="text-lg font-semibold mb-2 text-teal-600">Merge PDFs</h2>
+      <div class="flex items-center mb-2">
+
+        <div class="bg-wine-100 p-2 rounded-full mr-2">
+
+          <svg class="w-6 h-6 text-wine-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2m-6 4h6" />
+
+          </svg>
+
+        </div>
+
+        <h2 class="text-xl font-semibold text-wine-700">Merge PDFs</h2>
+
+      </div>
+
+      <p class="text-gray-600 mb-4">Combine multiple PDF files into one.</p>
 
       <input type="file" id="mergeFiles" multiple accept=".pdf" class="mb-2">
 
-      <button onclick="handleMerge()" class="bg-yellow-500 text-white px-3 py-1 rounded">Merge</button>
+      <button onclick="handleMerge()" class="bg-wine-700 text-white px-4 py-2 rounded hover:bg-wine-800">Merge</button>
 
     </section>
 
 
-    <section id="split" class="bg-white p-3 rounded-lg shadow hover:shadow-md transition">
+    <section id="compress" class="bg-white p-4 rounded-lg shadow">
 
-      <h2 class="text-lg font-semibold mb-2 text-teal-600">Split PDF</h2>
+      <div class="flex items-center mb-2">
+
+        <div class="bg-wine-100 p-2 rounded-full mr-2">
+
+          <svg class="w-6 h-6 text-wine-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2 1 3 2 3h12c1 0 2-1 2-3V7M5 10h14M5 14h14" />
+
+          </svg>
+
+        </div>
+
+        <h2 class="text-xl font-semibold text-wine-700">Compress PDF</h2>
+
+      </div>
+
+      <p class="text-gray-600 mb-4">Reduce the file size of your PDF documents.</p>
+
+      <input type="file" id="compressFile" accept=".pdf" class="mb-2">
+
+      <button onclick="handleCompress()" class="bg-wine-700 text-white px-4 py-2 rounded hover:bg-wine-800">Compress</button>
+
+    </section>
+
+
+    <section id="split" class="bg-white p-4 rounded-lg shadow">
+
+      <div class="flex items-center mb-2">
+
+        <div class="bg-wine-100 p-2 rounded-full mr-2">
+
+          <svg class="w-6 h-6 text-wine-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+
+          </svg>
+
+        </div>
+
+        <h2 class="text-xl font-semibold text-wine-700">Split PDF</h2>
+
+      </div>
+
+      <p class="text-gray-600 mb-4">Extract pages or split a PDF into multiple files.</p>
 
       <input type="file" id="splitFile" accept=".pdf" class="mb-2">
 
       <input type="number" id="splitPage" placeholder="Split at page" class="mb-2 p-1 w-full">
 
-      <button onclick="handleSplit()" class="bg-yellow-500 text-white px-3 py-1 rounded">Split</button>
+      <button onclick="handleSplit()" class="bg-wine-700 text-white px-4 py-2 rounded hover:bg-wine-800">Split</button>
 
     </section>
 
 
-    <section id="compress" class="bg-white p-3 rounded-lg shadow hover:shadow-md transition">
+    <section id="pdf-to-word" class="bg-white p-4 rounded-lg shadow">
 
-      <h2 class="text-lg font-semibold mb-2 text-teal-600">Compress PDF</h2>
+      <div class="flex items-center mb-2">
 
-      <input type="file" id="compressFile" accept=".pdf" class="mb-2">
+        <div class="bg-wine-100 p-2 rounded-full mr-2">
 
-      <button onclick="handleCompress()" class="bg-yellow-500 text-white px-3 py-1 rounded">Compress</button>
+          <svg class="w-6 h-6 text-wine-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 
-    </section>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
 
+          </svg>
 
-    <section id="pdf-to-word" class="bg-white p-3 rounded-lg shadow hover:shadow-md transition">
+        </div>
 
-      <h2 class="text-lg font-semibold mb-2 text-teal-600">PDF to Word</h2>
+        <h2 class="text-xl font-semibold text-wine-700">PDF to Word</h2>
+
+      </div>
+
+      <p class="text-gray-600 mb-4">Convert a PDF file to a Word document.</p>
 
       <input type="file" id="pdfToWordFile" accept=".pdf" class="mb-2">
 
-      <button onclick="handlePdfToWord()" class="bg-yellow-500 text-white px-3 py-1 rounded">Convert</button>
+      <button onclick="handlePdfToWord()" class="bg-wine-700 text-white px-4 py-2 rounded hover:bg-wine-800">Convert</button>
 
     </section>
 
 
-    <section id="word-to-pdf" class="bg-white p-3 rounded-lg shadow hover:shadow-md transition">
+    <section id="word-to-pdf" class="bg-white p-4 rounded-lg shadow">
 
-      <h2 class="text-lg font-semibold mb-2 text-teal-600">Word to PDF</h2>
+      <div class="flex items-center mb-2">
+
+        <div class="bg-wine-100 p-2 rounded-full mr-2">
+
+          <svg class="w-6 h-6 text-wine-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+
+          </svg>
+
+        </div>
+
+        <h2 class="text-xl font-semibold text-wine-700">Word to PDF</h2>
+
+      </div>
+
+      <p class="text-gray-600 mb-4">Convert a Word document to a PDF file.</p>
 
       <input type="file" id="wordToPdfFile" accept=".docx" class="mb-2">
 
-      <button onclick="handleWordToPdf()" class="bg-yellow-500 text-white px-3 py-1 rounded">Convert</button>
+      <button onclick="handleWordToPdf()" class="bg-wine-700 text-white px-4 py-2 rounded hover:bg-wine-800">Convert</button>
 
     </section>
 
   </main>
+
+
+  <!-- Footer -->
+
+  <footer class="bg-wine-900 text-white p-4 flex justify-between">
+
+    <div>
+
+      <p>PDFMaster</p>
+
+      <p>Your all-in-one solution for PDF management. Merge, split, compress, and convert documents with ease.</p>
+
+    </div>
+
+    <div>
+
+      <p>Quick Links</p>
+
+      <a href="#merge" class="block hover:underline">Merge PDF</a>
+
+      <a href="#split" class="block hover:underline">Split PDF</a>
+
+    </div>
+
+    <div>
+
+      <p>Contact & Legal</p>
+
+      <a href="#contact" class="block hover:underline">Contact Us</a>
+
+      <a href="#privacy" class="block hover:underline">Privacy Policy</a>
+
+    </div>
+
+  </footer>
 
 
   <script src="script.js"></script>
