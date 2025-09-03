@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>PDFMaster - Vibrant PDF Tools</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css">
+
+</head>
+
+<body class="bg-gray-100 text-gray-800 min-h-screen">
+
+  <!-- Top Navigation -->
+
+  <nav class="bg-teal-600 text-white p-4 flex justify-around items-center">
+
+    <h1 class="text-xl font-bold">PDFMaster</h1>
+
+    <div class="space-x-4">
+
+      <button id="darkModeToggle" class="bg-coral-500 px-2 py-1 rounded">Toggle Dark Mode</button>
+
+      <a href="#summarize" class="hover:underline">Summarize</a>
+
+      <a href="#merge" class="hover:underline">Merge</a>
+
+      <a href="#split" class="hover:underline">Split</a>
+
+      <a href="#compress" class="hover:underline">Compress</a>
+
+      <a href="#pdf-to-word" class="hover:underline">PDF to Word</a>
+
+      <a href="#word-to-pdf" class="hover:underline">Word to PDF</a>
+
+    </div>
+
+  </nav>
+
+
+  <!-- Main Content -->
+
+  <main class="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+    <section id="summarize" class="bg-white p-3 rounded-lg shadow hover:shadow-md transition">
+
+      <h2 class="text-lg font-semibold mb-2 text-teal-600">Summarize & Chat</h2>
+
+      <input type="file" id="summarizeFile" accept=".pdf" class="mb-2">
+
+      <button onclick="handleSummarize()" class="bg-yellow-500 text-white px-3 py-1 rounded">Process</button>
+
+      <div id="summarizeResult" class="mt-2 text-sm"></div>
+
+    </section>
+
+
+    <section id="merge" class="bg-white p-3 rounded-lg shadow hover:shadow-md transition">
+
+      <h2 class="text-lg font-semibold mb-2 text-teal-600">Merge PDFs</h2>
+
+      <input type="file" id="mergeFiles" multiple accept=".pdf" class="mb-2">
+
+      <button onclick="handleMerge()" class="bg-yellow-500 text-white px-3 py-1 rounded">Merge</button>
+
+    </section>
+
+
+    <section id="split" class="bg-white p-3 rounded-lg shadow hover:shadow-md transition">
+
+      <h2 class="text-lg font-semibold mb-2 text-teal-600">Split PDF</h2>
+
+      <input type="file" id="splitFile" accept=".pdf" class="mb-2">
+
+      <input type="number" id="splitPage" placeholder="Split at page" class="mb-2 p-1 w-full">
+
+      <button onclick="handleSplit()" class="bg-yellow-500 text-white px-3 py-1 rounded">Split</button>
+
+    </section>
+
+
+    <section id="compress" class="bg-white p-3 rounded-lg shadow hover:shadow-md transition">
+
+      <h2 class="text-lg font-semibold mb-2 text-teal-600">Compress PDF</h2>
+
+      <input type="file" id="compressFile" accept=".pdf" class="mb-2">
+
+      <button onclick="handleCompress()" class="bg-yellow-500 text-white px-3 py-1 rounded">Compress</button>
+
+    </section>
+
+
+    <section id="pdf-to-word" class="bg-white p-3 rounded-lg shadow hover:shadow-md transition">
+
+      <h2 class="text-lg font-semibold mb-2 text-teal-600">PDF to Word</h2>
+
+      <input type="file" id="pdfToWordFile" accept=".pdf" class="mb-2">
+
+      <button onclick="handlePdfToWord()" class="bg-yellow-500 text-white px-3 py-1 rounded">Convert</button>
+
+    </section>
+
+
+    <section id="word-to-pdf" class="bg-white p-3 rounded-lg shadow hover:shadow-md transition">
+
+      <h2 class="text-lg font-semibold mb-2 text-teal-600">Word to PDF</h2>
+
+      <input type="file" id="wordToPdfFile" accept=".docx" class="mb-2">
+
+      <button onclick="handleWordToPdf()" class="bg-yellow-500 text-white px-3 py-1 rounded">Convert</button>
+
+    </section>
+
+  </main>
+
+
+  <script src="script.js"></script>
+
+</body>
+
+</html>
