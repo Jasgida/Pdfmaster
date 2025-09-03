@@ -1,14 +1,4 @@
-/** @type {import('tailwindcss').Config} */
-
 module.exports = {
-
-  content: [
-
-    "./public/**/*.html",
-
-    "./public/**/*.js"
-
-  ],
 
   theme: {
 
@@ -16,32 +6,46 @@ module.exports = {
 
       colors: {
 
-        coral: {
+        'text-primary-light': '#2D3748',
 
-          500: '#FF6F61',
+        'text-primary-dark': '#CBD5E0',
 
-          600: '#E65B50'
+        'text-secondary-light': '#718096',
 
-        },
+        'text-secondary-dark': '#A0AEC0',
 
-        teal: {
+        'icon-default': '#4A5568',
 
-          600: '#26A69A'
+        'icon-hover': '#2B6CB0',
 
-        },
+        'icon-dark-default': '#A0AEC0',
 
-        yellow: {
+        'icon-dark-hover': '#63B3ED',
 
-          500: '#FFCA28'
+        'bg-light': '#F7FAFC',
 
-        }
+        'bg-dark': '#1A202C',
 
-      }
+        'button-bg': '#3182CE',
 
-    }
+        'button-hover': '#2B6CB0',
+
+        'button-dark-bg': '#4A90E2',
+
+        'button-dark-hover': '#63B3ED',
+
+        'accent-light': '#E2E8F0',
+
+        'accent-dark': '#4A5568',
+
+      },
+
+    },
 
   },
 
-  plugins: []
+  darkMode: 'class',
 
-}
+  plugins: [],
+
+};

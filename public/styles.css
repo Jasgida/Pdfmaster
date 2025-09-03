@@ -1,9 +1,49 @@
-
-x@tailwind base;
+@tailwind base;
 
 @tailwind components;
 
 @tailwind utilities;
+
+
+@layer base {
+
+  :root {
+
+    --text-primary-light: #2D3748;
+
+    --text-primary-dark: #CBD5E0;
+
+    --text-secondary-light: #718096;
+
+    --text-secondary-dark: #A0AEC0;
+
+    --icon-default: #4A5568;
+
+    --icon-hover: #2B6CB0;
+
+    --icon-dark-default: #A0AEC0;
+
+    --icon-dark-hover: #63B3ED;
+
+    --bg-light: #F7FAFC;
+
+    --bg-dark: #1A202C;
+
+    --button-bg: #3182CE;
+
+    --button-hover: #2B6CB0;
+
+    --button-dark-bg: #4A90E2;
+
+    --button-dark-hover: #63B3ED;
+
+    --accent-light: #E2E8F0;
+
+    --accent-dark: #4A5568;
+
+  }
+
+}
 
 
 @layer components {
@@ -12,7 +52,7 @@ x@tailwind base;
 
     display: none;
 
-    gap: 0.375rem; /* 6px */
+    gap: 0.375rem;
 
     align-items: flex-end;
 
@@ -27,9 +67,9 @@ x@tailwind base;
 
   .thinking-indicator span {
 
-    width: 0.625rem; /* 10px */
+    width: 0.625rem;
 
-    height: 0.625rem; /* 10px */
+    height: 0.625rem;
 
     border-radius: 9999px;
 
@@ -58,7 +98,7 @@ x@tailwind base;
 
     0%, 60%, 100% { transform: translateY(0); }
 
-    30% { transform: translateY(-0.75rem); /* -12px */ }
+    30% { transform: translateY(-0.75rem); }
 
   }
 
@@ -74,22 +114,6 @@ x@tailwind base;
 
 @media (max-width: 767px) {
 
-  nav div { flex-direction: column; gap: 0.5rem; }
-
-  main { grid-template-columns: 1fr; }
-
-}
-
-
-@media (min-width: 768px) and (max-width: 1024px) {
-
-  main { grid-template-columns: 1fr 1fr; }
-
-}
-
-
-@media (min-width: 1025px) {
-
-  main { grid-template-columns: 1fr 1fr 1fr; }
+  main { padding-top: 2rem; padding-bottom: 2rem; }
 
 }
