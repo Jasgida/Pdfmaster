@@ -1,0 +1,205 @@
+<!doctype html>
+
+<html lang="en" class="">
+
+<head>
+
+    <meta charset="utf-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>PDFMaster - Processing...</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/output.css">
+
+    <script>
+
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+
+            document.documentElement.classList.add('dark');
+
+        } else {
+
+            document.documentElement.classList.remove('dark');
+
+        }
+
+    </script>
+
+</head>
+
+<body class="bg-bg-light dark:bg-bg-dark text-text-primary-light dark:text-text-primary-dark font-sans antialiased flex flex-col min-h-screen">
+
+    <!-- Header (same as index.html, omitted for brevity) -->
+
+    <header><!-- ... --></header>
+
+    <main class="container mx-auto px-4 py-24 flex-grow">
+
+        <div class="max-w-4xl mx-auto text-center">
+
+            <div id="progress-container">
+
+                <h1 class="text-3xl font-bold tracking-tight text-text-primary-light dark:text-text-primary-dark sm:text-4xl font-serif">Processing your request...</h1>
+
+                <div class="flex justify-center items-center mt-8">
+
+                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-button-bg" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+
+                    </svg>
+
+                </div>
+
+                <div id="status" class="mt-4 text-lg text-text-secondary-light dark:text-text-secondary-dark">Please wait, this may take a moment.</div>
+
+            </div>
+
+            <div id="result-container" class="mt-8" style="display: none;">
+
+                <h1 class="text-3xl font-bold tracking-tight text-text-primary-light dark:text-text-primary-dark sm:text-4xl font-serif mb-4">Your File is Ready!</h1>
+
+                <div id="preview-area" class="rounded-xl border border-accent-light dark:border-accent-dark bg-bg-light dark:bg-bg-dark/50 shadow-sm" style="height: 70vh;"></div>
+
+                <div id="download-area" class="mt-6"></div>
+
+            </div>
+
+        </div>
+
+        <script>
+
+            document.addEventListener("DOMContentLoaded", function() {
+
+                const urlParams = new URLSearchParams(window.location.search);
+
+                const taskId = urlParams.get('task_id');
+
+                const statusDiv = document.getElementById('status');
+
+                const progressContainer = document.getElementById('progress-container');
+
+                const resultContainer = document.getElementById('result-container');
+
+                const previewArea = document.getElementById('preview-area');
+
+                const downloadArea = document.getElementById('download-area');
+
+
+                const pollStatus = setInterval(async () => {
+
+                    try {
+
+                        const response = await fetch(`/status/${taskId}`);
+
+                        if (!response.ok) throw new Error('Network response was not ok');
+
+                        const data = await response.json();
+
+
+                        if (data.state && data.state.toLowerCase() !== 'pending' && data.state.toLowerCase() !== 'started') {
+
+                            statusDiv.textContent = `Status: ${data.state}`;
+
+                        }
+
+
+                        if (data.state === 'SUCCESS') {
+
+                            clearInterval(pollStatus);
+
+                            progressContainer.style.display = 'none';
+
+                            resultContainer.style.display = 'block';
+
+
+                            const relativePath = data.result;
+
+                            if (typeof relativePath !== 'string') throw new Error('Invalid result format');
+
+
+                            const fileUrl = `/uploads/${relativePath}`;
+
+                            const downloadUrl = `/download/${relativePath}`;
+
+                            const filename = relativePath.split('/')[1];
+
+
+                            if (filename.toLowerCase().endsWith('.pdf')) {
+
+                                const iframe = document.createElement('iframe');
+
+                                iframe.src = fileUrl;
+
+                                iframe.className = 'w-full h-full rounded-lg';
+
+                                previewArea.appendChild(iframe);
+
+                            } else {
+
+                                previewArea.innerHTML = `
+
+                                    <div class="flex items-center justify-center h-full p-6 bg-bg-light dark:bg-bg-dark/50 rounded-xl">
+
+                                        <div class="text-center">
+
+                                            <svg class="h-5 w-5 text-text-secondary-light dark:text-text-secondary-dark" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+
+                                            <h3 class="mt-2 text-sm font-medium text-text-primary-light dark:text-text-primary-dark">Preview not available</h3>
+
+                                        </div>
+
+                                    </div>`;
+
+                            }
+
+
+                            const downloadLink = document.createElement('a');
+
+                            downloadLink.href = downloadUrl;
+
+                            downloadLink.innerHTML = `<svg class="h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download ${filename}`;
+
+                            downloadLink.className = 'btn-primary';
+
+                            downloadArea.appendChild(downloadLink);
+
+
+                        } else if (data.state === 'FAILURE') {
+
+                            clearInterval(pollStatus);
+
+                            progressContainer.innerHTML = '<p class="text-red-600 dark:text-red-500">Processing failed. Please try again.</p>';
+
+                        }
+
+                    } catch (error) {
+
+                        console.error('Error polling status:', error);
+
+                        progressContainer.innerHTML = '<p class="text-red-600 dark:text-red-500">Error checking status. Please refresh and try again.</p>';
+
+                        clearInterval(pollStatus);
+
+                    }
+
+                }, 2000);
+
+            });
+
+        </script>
+
+    </main>
+
+</body>
+
+</html>

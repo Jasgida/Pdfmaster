@@ -9,9 +9,9 @@
 
   :root {
 
-    --text-primary-light: #2D3748;
+    --text-primary-light: #2D3748; /* Dark gray for light mode */
 
-    --text-primary-dark: #CBD5E0;
+    --text-primary-dark: #E2E8F0; /* Light gray for dark mode */
 
     --text-secondary-light: #718096;
 
@@ -40,6 +40,22 @@
     --accent-light: #E2E8F0;
 
     --accent-dark: #4A5568;
+
+  }
+
+
+  body {
+
+    @apply bg-bg-light text-text-primary-light dark:bg-bg-dark dark:text-text-primary-dark;
+
+  }
+
+
+  /* Ensure text is visible and styled consistently */
+
+  header a, header span, main h1, main p {
+
+    @apply text-text-primary-light dark:text-text-primary-dark;
 
   }
 
@@ -110,10 +126,22 @@
 }
 
 
-/* Custom responsive adjustments */
+.btn-primary {
 
-@media (max-width: 767px) {
+  @apply inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-button-bg hover:bg-button-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-button-bg dark:bg-button-dark-bg dark:hover:bg-button-dark-hover dark:focus:ring-offset-bg-dark;
 
-  main { padding-top: 2rem; padding-bottom: 2rem; }
+}
+
+
+input[type="file"] {
+
+  @apply block w-full text-sm text-text-secondary-light dark:text-text-secondary-dark;
+
+}
+
+
+input[type="file"]::file-selector-button {
+
+  @apply mr-4 py-2 px-4 rounded-full border-0 text-sm font-semibold bg-accent-light dark:bg-accent-dark text-text-primary-light dark:text-text-primary-dark hover:bg-accent-light/80 dark:hover:bg-accent-dark/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-button-bg dark:focus:ring-offset-bg-dark;
 
 }

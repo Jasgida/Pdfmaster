@@ -2,252 +2,298 @@ const express = require('express');
 
 const multer = require('multer');
 
-const fs = require('fs');
+const { PDFDocument } = require('pdf-lib');
+
+const fs = require('fs').promises;
 
 const path = require('path');
 
-const { PDFDocument } = require('pdf-lib');
-
-const { Document, Packer, Paragraph } = require('docx'); // For Word handling
-
-// For PDF to Docx, use a lib like pdf-to-docx if available; placeholder here.
+require('dotenv').config();
 
 
 const app = express();
 
-const upload = multer({ dest: 'uploads/' });
+const port = process.env.PORT || 3000;
 
 
-app.use(express.static('public'));
+// Set up storage for uploaded files
 
-app.use(express.json());
+const storage = multer.diskStorage({
 
+    destination: './uploads/',
 
-// Helper: Clean up files after processing
+    filename: (req, file, cb) => {
 
-const cleanup = (files) => files.forEach(file => fs.unlinkSync(file));
-
-
-// Summarize & Chat (Placeholder: Extracts text; replace with AI API call)
-
-app.post('/summarize', upload.single('pdf'), async (req, res) => {
-
-  const filePath = req.file.path;
-
-  try {
-
-    const pdfDoc = await PDFDocument.load(fs.readFileSync(filePath));
-
-    let text = '';
-
-    for (let i = 0; i < pdfDoc.getPageCount(); i++) {
-
-      // Simple text extraction placeholder. For real AI, call xAI API here.
-
-      // Example: const response = await fetch('https://api.x.ai/v1/chat', { method: 'POST', body: JSON.stringify({ prompt: 'Summarize this PDF text: ' + extractedText }) });
-
-      text += `Page ${i+1}: Placeholder summary.\n`; // Replace with actual extraction/AI.
+        cb(null, Date.now() + '-' + file.originalname);
 
     }
 
-    res.json({ summary: text });
+});
 
-  } catch (err) {
+const upload = multer({ 
 
-    res.status(500).send('Error summarizing PDF');
+    storage: storage, 
 
-  } finally {
-
-    cleanup([filePath]);
-
-  }
+    limits: { fileSize: parseInt(process.env.UPLOAD_LIMIT) || 10 * 1024 * 1024 }
 
 });
+
+
+// Serve static files with caching in production
+
+app.use(express.static('public', { maxAge: process.env.NODE_ENV === 'production' ? '1d' : 0 }));
+
+app.use(express.urlencoded({ extended: true }));
+
+
+// Task status tracking
+
+const tasks = {};
+
+
+function generateTaskId() {
+
+    return 'xxxx-xxxx-xxxx-xxxx'.replace(/x/g, () => (Math.random() * 16 | 0).toString(16));
+
+}
 
 
 // Merge PDFs
 
-app.post('/merge', upload.array('pdfs', 10), async (req, res) => {
+app.post('/merge', upload.array('files'), async (req, res) => {
 
-  const files = req.files.map(f => f.path);
+    const taskId = generateTaskId();
 
-  try {
+    tasks[taskId] = { state: 'PENDING' };
 
-    const mergedPdf = await PDFDocument.create();
+    res.redirect(`/processing?task_id=${taskId}`);
 
-    for (const file of files) {
 
-      const pdf = await PDFDocument.load(fs.readFileSync(file));
+    try {
 
-      const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+        const mergedPdf = await PDFDocument.create();
 
-      copiedPages.forEach(page => mergedPdf.addPage(page));
+        for (const file of req.files) {
+
+            const pdfBytes = await fs.readFile(file.path);
+
+            const pdf = await PDFDocument.load(pdfBytes);
+
+            const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+
+            copiedPages.forEach(page => mergedPdf.addPage(page));
+
+        }
+
+        const mergedPdfBytes = await mergedPdf.save();
+
+        const outputPath = path.join('uploads', `merged-${Date.now()}.pdf`);
+
+        await fs.writeFile(outputPath, mergedPdfBytes);
+
+        tasks[taskId] = { state: 'SUCCESS', result: outputPath };
+
+    } catch (error) {
+
+        tasks[taskId] = { state: 'FAILURE' };
 
     }
 
-    const mergedBytes = await mergedPdf.save();
+});
 
-    res.set('Content-Type', 'application/pdf');
 
-    res.send(mergedBytes);
+// Split PDFs
 
-  } catch (err) {
+app.post('/split', upload.single('file'), async (req, res) => {
 
-    res.status(500).send('Error merging PDFs');
+    const taskId = generateTaskId();
 
-  } finally {
+    tasks[taskId] = { state: 'PENDING' };
 
-    cleanup(files);
+    res.redirect(`/processing?task_id=${taskId}`);
 
-  }
+
+    try {
+
+        const pdfBytes = await fs.readFile(req.file.path);
+
+        const pdf = await PDFDocument.load(pdfBytes);
+
+        const ranges = req.body.ranges ? req.body.ranges.split(',').map(r => r.trim()) : [];
+
+        const outputFiles = [];
+
+
+        if (ranges.length === 0) {
+
+            for (let i = 0; i < pdf.getPageCount(); i++) {
+
+                const newPdf = await PDFDocument.create();
+
+                newPdf.addPage(await pdf.getPage(i).copy());
+
+                const outputPath = path.join('uploads', `split-${Date.now()}-${i + 1}.pdf`);
+
+                await fs.writeFile(outputPath, await newPdf.save());
+
+                outputFiles.push(outputPath);
+
+            }
+
+        } else {
+
+            for (const range of ranges) {
+
+                const [start, end] = range.split('-').map(n => n ? parseInt(n) - 1 : null);
+
+                const pages = end ? pdf.getPages().slice(start, end) : pdf.getPages().slice(start);
+
+                const newPdf = await PDFDocument.create();
+
+                pages.forEach(page => newPdf.addPage(page.copy()));
+
+                const outputPath = path.join('uploads', `split-${Date.now()}-${start + 1}.pdf`);
+
+                await fs.writeFile(outputPath, await newPdf.save());
+
+                outputFiles.push(outputPath);
+
+            }
+
+        }
+
+        tasks[taskId] = { state: 'SUCCESS', result: outputFiles[0] };
+
+    } catch (error) {
+
+        tasks[taskId] = { state: 'FAILURE' };
+
+    }
 
 });
 
 
-// Split PDF
+// PDF to Word (placeholder)
 
-app.post('/split', upload.single('pdf'), async (req, res) => {
+app.post('/pdf-to-word', upload.single('file'), (req, res) => {
 
-  const filePath = req.file.path;
+    const taskId = generateTaskId();
 
-  const { page } = req.body; // e.g., page number to split at
+    tasks[taskId] = { state: 'PENDING' };
 
-  try {
+    res.redirect(`/processing?task_id=${taskId}`);
 
-    const pdf = await PDFDocument.load(fs.readFileSync(filePath));
 
-    const splitPdf1 = await PDFDocument.create();
+    setTimeout(() => {
 
-    const splitPdf2 = await PDFDocument.create();
+        const outputPath = path.join('uploads', `converted-${Date.now()}.docx`);
 
-    const pages = await splitPdf1.copyPages(pdf, Array.from({length: page}, (_, i) => i));
+        fs.writeFile(outputPath, 'Converted content', (err) => {
 
-    pages.forEach(p => splitPdf1.addPage(p));
+            if (err) tasks[taskId] = { state: 'FAILURE' };
 
-    const remainingPages = await splitPdf2.copyPages(pdf, Array.from({length: pdf.getPageCount() - page}, (_, i) => i + page));
+            else tasks[taskId] = { state: 'SUCCESS', result: outputPath };
 
-    remainingPages.forEach(p => splitPdf2.addPage(p));
+        });
 
-    
-
-    const zip = require('adm-zip'); // Add 'adm-zip' to dependencies if needed
-
-    const zipper = new zip();
-
-    zipper.addFile('split1.pdf', await splitPdf1.save());
-
-    zipper.addFile('split2.pdf', await splitPdf2.save());
-
-    res.set('Content-Type', 'application/zip');
-
-    res.send(zipper.toBuffer());
-
-  } catch (err) {
-
-    res.status(500).send('Error splitting PDF');
-
-  } finally {
-
-    cleanup([filePath]);
-
-  }
+    }, 2000);
 
 });
 
 
-// Compress PDF (Simple: Reduce quality; for advanced, use other libs)
+// Word to PDF (placeholder)
 
-app.post('/compress', upload.single('pdf'), async (req, res) => {
+app.post('/word-to-pdf', upload.single('file'), (req, res) => {
 
-  const filePath = req.file.path;
+    const taskId = generateTaskId();
 
-  try {
+    tasks[taskId] = { state: 'PENDING' };
 
-    const pdf = await PDFDocument.load(fs.readFileSync(filePath));
+    res.redirect(`/processing?task_id=${taskId}`);
 
-    // Placeholder compression: Remove metadata or downsample images (pdf-lib doesn't compress directly; use ghostscript externally if needed).
 
-    const compressedBytes = await pdf.save({ useObjectStreams: false }); // Basic optimization
+    setTimeout(() => {
 
-    res.set('Content-Type', 'application/pdf');
+        const outputPath = path.join('uploads', `converted-${Date.now()}.pdf`);
 
-    res.send(compressedBytes);
+        fs.writeFile(outputPath, 'Converted content', (err) => {
 
-  } catch (err) {
+            if (err) tasks[taskId] = { state: 'FAILURE' };
 
-    res.status(500).send('Error compressing PDF');
+            else tasks[taskId] = { state: 'SUCCESS', result: outputPath };
 
-  } finally {
+        });
 
-    cleanup([filePath]);
-
-  }
+    }, 2000);
 
 });
 
 
-// PDF to Word (Placeholder: Convert to basic Docx)
+// Summarize and Chat (placeholder)
 
-app.post('/pdf-to-word', upload.single('pdf'), async (req, res) => {
+app.post('/summarize', upload.single('file'), (req, res) => {
 
-  const filePath = req.file.path;
+    const taskId = generateTaskId();
 
-  try {
+    tasks[taskId] = { state: 'PENDING' };
 
-    // Use pdf-to-docx or similar; placeholder with docx lib.
+    res.redirect(`/processing?task_id=${taskId}`);
 
-    const doc = new Document({ sections: [{ children: [new Paragraph('Placeholder PDF content converted to Word.')] }] });
 
-    const buffer = await Packer.toBuffer(doc);
+    setTimeout(() => {
 
-    res.set('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+        const outputPath = path.join('uploads', `summary-${Date.now()}.txt`);
 
-    res.send(buffer);
+        fs.writeFile(outputPath, 'Summary content', (err) => {
 
-  } catch (err) {
+            if (err) tasks[taskId] = { state: 'FAILURE' };
 
-    res.status(500).send('Error converting PDF to Word');
+            else tasks[taskId] = { state: 'SUCCESS', result: outputPath };
 
-  } finally {
+        });
 
-    cleanup([filePath]);
-
-  }
+    }, 2000);
 
 });
 
 
-// Word to PDF (Placeholder: Convert Docx to PDF)
+// Status polling
 
-app.post('/word-to-pdf', upload.single('docx'), async (req, res) => {
+app.get('/status/:taskId', (req, res) => {
 
-  const filePath = req.file.path;
+    const task = tasks[req.params.taskId];
 
-  try {
-
-    // Requires a lib like docx-to-pdf; placeholder.
-
-    const pdf = await PDFDocument.create();
-
-    pdf.addPage(); // Add content from Docx parsing.
-
-    const pdfBytes = await pdf.save();
-
-    res.set('Content-Type', 'application/pdf');
-
-    res.send(pdfBytes);
-
-  } catch (err) {
-
-    res.status(500).send('Error converting Word to PDF');
-
-  } finally {
-
-    cleanup([filePath]);
-
-  }
+    res.json(task || { state: 'NOT_FOUND' });
 
 });
 
 
-app.listen(3000, () => console.log('Server running on port 3000'));
+// Download endpoint
+
+app.get('/download/:filename', (req, res) => {
+
+    const filePath = path.join('uploads', req.params.filename);
+
+    res.download(filePath, err => {
+
+        if (err) res.status(404).send('File not found');
+
+    });
+
+});
+
+
+// Error handling
+
+app.use((err, req, res, next) => {
+
+    res.redirect(`/error?message=${encodeURIComponent(err.message || 'An unexpected error occurred.')}`);
+
+});
+
+
+app.listen(port, () => {
+
+    console.log(`Server running on http://localhost:${port}`);
+
+});
