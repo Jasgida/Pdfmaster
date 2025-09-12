@@ -2,140 +2,57 @@ const express = require('express');
 
 const path = require('path');
 
-const multer = require('multer');
-
-const { PDFDocument } = require('pdf-lib');
-
-const fs = require('fs/promises');
-
 
 const app = express();
 
 const port = process.env.PORT || 3000;
 
 
-app.use(express.static(path.join(__dirname, 'dist')));
+// Disable static middleware for now to test routing
 
-app.get('*', (req, res) => {
-
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
-
-});
+// app.use(express.static(path.join(__dirname, 'dist')));
 
 
-const storage = multer.diskStorage({
+// Explicit root route with detailed logging
 
-  destination: (req, file, cb) => cb(null, 'uploads/'),
+app.get('/', (req, res) => {
 
-  filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
+  console.log(`Root request received - Method: ${req.method}, URL: ${req.url}, Headers: ${JSON.stringify(req.headers)}`);
 
-});
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'), (err) => {
 
-const upload = multer({ storage });
+    if (err) {
 
+      console.error('Error serving index.html:', err);
 
-app.post('/merge', upload.array('files'), async (req, res) => {
-
-  try {
-
-    const pdfDoc = await PDFDocument.create();
-
-    for (const file of req.files) {
-
-      const bytes = await fs.readFile(file.path);
-
-      const doc = await PDFDocument.load(bytes);
-
-      const copiedPages = await pdfDoc.copyPages(doc, doc.getPageIndices());
-
-      copiedPages.forEach((page) => pdfDoc.addPage(page));
+      res.status(500).send('Server error');
 
     }
 
-    const pdfBytes = await pdfDoc.save();
-
-    res.contentType('application/pdf');
-
-    res.send(pdfBytes);
-
-  } catch (error) {
-
-    res.status(500).send('Error merging PDFs');
-
-  }
+  });
 
 });
 
 
-app.post('/compress', upload.single('file'), async (req, res) => {
+// Fallback for all routes with detailed logging
 
-  try {
+app.get('*', (req, res) => {
 
-    const bytes = await fs.readFile(req.file.path);
+  console.log(`Wildcard request for ${req.path} - Method: ${req.method}, URL: ${req.url}, Headers: ${JSON.stringify(req.headers)}`);
 
-    const pdfDoc = await PDFDocument.load(bytes);
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'), (err) => {
 
-    const pdfBytes = await pdfDoc.save({ useObjectStreams: true });
+    if (err) {
 
-    res.contentType('application/pdf');
+      console.error('Error serving index.html:', err);
 
-    res.send(pdfBytes);
+      res.status(500).send('Server error');
 
-  } catch (error) {
+    }
 
-    res.status(500).send('Error compressing PDF');
-
-  }
+  });
 
 });
-
-
-app.post('/split', upload.single('file'), async (req, res) => {
-
-  try {
-
-    const bytes = await fs.readFile(req.file.path);
-
-    const pdfDoc = await PDFDocument.load(bytes);
-
-    const pageNumber = 1; // Split at page 1 (example)
-
-    const newPdf = await PDFDocument.create();
-
-    const [copiedPage] = await newPdf.copyPages(pdfDoc, [pageNumber - 1]);
-
-    newPdf.addPage(copiedPage);
-
-    const pdfBytes = await newPdf.save();
-
-    res.contentType('application/pdf');
-
-    res.send(pdfBytes);
-
-  } catch (error) {
-
-    res.status(500).send('Error splitting PDF');
-
-  }
-
-});
-
-
-app.post('/pdf-to-word', upload.single('file'), (req, res) => {
-
-  res.status(501).send('PDF to Word conversion not implemented yet.');
-
-});
-
-
-app.post('/word-to-pdf', upload.single('file'), (req, res) => {
-
-  res.status(501).send('Word to PDF conversion not implemented yet.');
-
-});
-
-
-fs.mkdir('uploads', { recursive: true }).catch(console.error);
 
 
 app.listen(port, () => {
