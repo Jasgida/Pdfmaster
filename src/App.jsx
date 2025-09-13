@@ -1,76 +1,157 @@
-import React from 'react';
+// src/App.jsx
 
-import FeatureCard from './components/FeatureCard';
+import React from "react";
 
-
-const features = [
-
-  { title: 'Summarize & Chat', description: 'Use AI to summarize and ask questions about your PDF documents.', icon: 'í ¾í· ' },
-
-  { title: 'Merge PDFs', description: 'Combine multiple PDF files into one.', icon: 'í ½í³Ž' },
-
-  { title: 'Compress PDF', description: 'Reduce the file size of your PDF documents.', icon: 'í ½í·œï¸' },
-
-  { title: 'Split PDF', description: 'Extract pages or split a PDF into multiple files.', icon: 'âœ‚ï¸' },
-
-  { title: 'PDF to Word', description: 'Convert a PDF file to a Word document.', icon: 'í ½í³„âž¡ï¸í ½í³' },
-
-  { title: 'Word to PDF', description: 'Convert a Word document to a PDF file.', icon: 'í ½í³âž¡ï¸í ½í³„' },
-
-];
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 
 
-const App = () => {
+import Navbar from "./components/Navbar";
+
+import MergePdf from "./pages/MergePdf";
+
+import SplitPdf from "./pages/SplitPdf";
+
+import CompressPdf from "./pages/CompressPdf";
+
+import SummarizePdf from "./pages/SummarizePdf";
+
+import WordToPdf from "./pages/WordToPdf";
+
+import PdfToWord from "./pages/PdfToWord";
+
+
+export default function App() {
 
   return (
 
-    <div className="min-h-screen bg-gray-50 p-6">
+    <Router>
 
-      <header className="flex justify-between items-center mb-10">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
 
-        <div className="text-2xl font-bold text-blue-600">í ½í³„ Pdfmaster</div>
-
-        <nav className="space-x-6 text-gray-600 text-sm">
-
-          <a href="#">Summarize & Chat</a>
-
-          <a href="#">Merge</a>
-
-          <a href="#">Split</a>
-
-          <a href="#">Compress</a>
-
-          <a href="#">Convert</a>
-
-        </nav>
-
-      </header>
+        <Navbar />
 
 
-      <main className="text-center">
+        {/* Hero Section */}
 
-        <h1 className="text-4xl font-extrabold text-gray-800 mb-4">Pdfmaster</h1>
+        <header className="text-center py-16 bg-gray-100 dark:bg-gray-800">
 
-        <p className="text-gray-600 mb-12">Your all-in-one solution for PDF management.</p>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-wine">
+
+            The Ultimate PDF Toolkit â€“ Fast, Secure & Powerful
+
+          </h1>
+
+          <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
+
+            No ads, no signups. Just smart tools to make your documents easier to handle.
+
+          </p>
 
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Main action buttons */}
 
-          {features.map((feature) => (
+          <div className="flex flex-wrap justify-center gap-4">
 
-            <FeatureCard key={feature.title} {...feature} />
+            <Link
 
-          ))}
+              to="/merge"
 
-        </div>
+              className="bg-wine text-white px-6 py-3 rounded-lg shadow-md hover:bg-wine/80 transition"
 
-      </main>
+            >
 
-    </div>
+              Merge PDFs
+
+            </Link>
+
+            <Link
+
+              to="/split"
+
+              className="bg-wine text-white px-6 py-3 rounded-lg shadow-md hover:bg-wine/80 transition"
+
+            >
+
+              Split PDF
+
+            </Link>
+
+            <Link
+
+              to="/compress"
+
+              className="bg-wine text-white px-6 py-3 rounded-lg shadow-md hover:bg-wine/80 transition"
+
+            >
+
+              Compress PDF
+
+            </Link>
+
+            <Link
+
+              to="/summarize"
+
+              className="bg-wine text-white px-6 py-3 rounded-lg shadow-md hover:bg-wine/80 transition"
+
+            >
+
+              Summarize PDF
+
+            </Link>
+
+            <Link
+
+              to="/word-to-pdf"
+
+              className="bg-wine text-white px-6 py-3 rounded-lg shadow-md hover:bg-wine/80 transition"
+
+            >
+
+              Word â†’ PDF
+
+            </Link>
+
+            <Link
+
+              to="/pdf-to-word"
+
+              className="bg-wine text-white px-6 py-3 rounded-lg shadow-md hover:bg-wine/80 transition"
+
+            >
+
+              PDF â†’ Word
+
+            </Link>
+
+          </div>
+
+        </header>
+
+
+        {/* Routes */}
+
+        <Routes>
+
+          <Route path="/merge" element={<MergePdf />} />
+
+          <Route path="/split" element={<SplitPdf />} />
+
+          <Route path="/compress" element={<CompressPdf />} />
+
+          <Route path="/summarize" element={<SummarizePdf />} />
+
+          <Route path="/word-to-pdf" element={<WordToPdf />} />
+
+          <Route path="/pdf-to-word" element={<PdfToWord />} />
+
+        </Routes>
+
+      </div>
+
+    </Router>
 
   );
 
-};
+}
 
-
-export default App;

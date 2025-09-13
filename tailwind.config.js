@@ -1,22 +1,28 @@
+// tailwind.config.js
+
 /** @type {import('tailwindcss').Config} */
 
 module.exports = {
 
-  content: [
+  darkMode: "class",
 
-    "./index.html",
-
-    "./src/**/*.{js,jsx,ts,tsx}"
-
-  ],
+  content: ["./index.html", "./src/**/*.{js,jsx}"],
 
   theme: {
 
-    extend: {},
+    extend: {
+
+      colors: {
+
+        wine: "#7B1E3A", // dark wine red
+
+      },
+
+    },
 
   },
 
   plugins: [],
 
-}
+};
 

@@ -1,39 +1,134 @@
-const express = require('express');
+// server.js
 
-const path = require('path');
+import express from "express";
+
+import multer from "multer";
+
+import fs from "fs";
+
+import path from "path";
+
+import libre from "libreoffice-convert";
+
 
 const app = express();
 
-
-const port = process.env.PORT || 3000;
-
-
-// Serve static files from /public (where Docker copies dist)
-
-app.use(express.static(path.join(__dirname, 'public')));
+const PORT = 5000;
 
 
-// API health check
+// File upload middleware
 
-app.get('/api/health', (req, res) => {
-
-  res.json({ status: 'ok', message: 'Backend running' });
-
-});
+const upload = multer({ dest: "uploads/" });
 
 
-// React fallback
+// ========== ROUTES ==========
 
-app.get('*', (req, res) => {
 
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// Merge PDFs (placeholder)
+
+app.post("/merge", upload.array("pdfs"), (req, res) => {
+
+  // TODO: implement merging logic with pdf-lib or hummus
+
+  res.send("Merging not implemented yet");
 
 });
 
 
-app.listen(port, () => {
+// Word â†’ PDF
 
-  console.log(`Server running on http://localhost:${port}`);
+app.post("/word-to-pdf", upload.single("word"), (req, res) => {
+
+  const filePath = req.file.path;
+
+  const ext = ".pdf";
+
+  const outputPath = `${filePath}${ext}`;
+
+
+  const file = fs.readFileSync(filePath);
+
+
+  libre.convert(file, ext, undefined, (err, done) => {
+
+    if (err) {
+
+      console.error(`Error converting file: ${err}`);
+
+      return res.status(500).send("Conversion failed");
+
+    }
+
+
+    fs.writeFileSync(outputPath, done);
+
+    res.download(outputPath, "converted.pdf", (err) => {
+
+      fs.unlinkSync(filePath);
+
+      fs.unlinkSync(outputPath);
+
+    });
+
+  });
+
+});
+
+
+// PDF â†’ Word
+
+app.post("/pdf-to-word", upload.single("pdf"), (req, res) => {
+
+  const filePath = req.file.path;
+
+  const ext = ".docx";
+
+  const outputPath = `${filePath}${ext}`;
+
+
+  const file = fs.readFileSync(filePath);
+
+
+  libre.convert(file, ext, undefined, (err, done) => {
+
+    if (err) {
+
+      console.error(`Error converting file: ${err}`);
+
+      return res.status(500).send("Conversion failed");
+
+    }
+
+
+    fs.writeFileSync(outputPath, done);
+
+    res.download(outputPath, "converted.docx", (err) => {
+
+      fs.unlinkSync(filePath);
+
+      fs.unlinkSync(outputPath);
+
+    });
+
+  });
+
+});
+
+
+// Health check
+
+app.get("/", (req, res) => {
+
+  res.send("PDFMaster backend is running í ½íº€");
+
+});
+
+
+// Start server
+
+app.listen(PORT, () => {
+
+  console.log(`Server running on http://localhost:${PORT}`);
 
 });
 
