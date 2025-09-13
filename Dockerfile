@@ -1,44 +1,48 @@
-# Build stage for frontend
+# Stage 1: Build React frontend
 
 FROM node:18 AS build
 
-
 WORKDIR /app
-
 
 COPY package*.json ./
 
 RUN npm install
-
 
 COPY . .
 
 RUN npm run build
 
 
-# Final stage for running the app
+# Stage 2: Setup backend + serve frontend
 
 FROM node:18-slim
-
 
 WORKDIR /app
 
 
-COPY --from=build /app/dist ./dist
+# Copy backend dependencies
 
-COPY --from=build /app/server.js .
+COPY package*.json ./
 
-COPY --from=build /app/package*.json ./
-
-COPY --from=build /app/node_modules ./node_modules
+RUN npm install --omit=dev
 
 
-# Create uploads directory
+# Copy backend server
+
+COPY server.js ./
+
+
+# Copy frontend build into /public (for Express)
+
+COPY --from=build /app/dist ./public
+
+
+# Copy uploads directory
 
 RUN mkdir -p uploads
 
 
 EXPOSE 3000
 
-
 CMD ["node", "server.js"]
+

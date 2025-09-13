@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from "vite";
 
-import react from '@vitejs/plugin-react';
+import react from "@vitejs/plugin-react";
 
 
 export default defineConfig({
@@ -9,24 +9,15 @@ export default defineConfig({
 
   build: {
 
-    outDir: 'dist',
-
-    rollupOptions: {
-
-      input: {
-
-        main: './src/main.jsx', // Entry point is the React app
-
-      },
-
-    },
+    outDir: "dist",
 
   },
 
   define: {
 
-    'process.env.NODE_ENV': JSON.stringify('production'),
+    "process.env.NODE_ENV": JSON.stringify("production"),
 
   },
 
 });
+

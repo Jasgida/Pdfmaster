@@ -2,55 +2,31 @@ const express = require('express');
 
 const path = require('path');
 
-
 const app = express();
+
 
 const port = process.env.PORT || 3000;
 
 
-// Disable static middleware for now to test routing
+// Serve static files from /public (where Docker copies dist)
 
-// app.use(express.static(path.join(__dirname, 'dist')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 
-// Explicit root route with detailed logging
+// API health check
 
-app.get('/', (req, res) => {
+app.get('/api/health', (req, res) => {
 
-  console.log(`Root request received - Method: ${req.method}, URL: ${req.url}, Headers: ${JSON.stringify(req.headers)}`);
-
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'), (err) => {
-
-    if (err) {
-
-      console.error('Error serving index.html:', err);
-
-      res.status(500).send('Server error');
-
-    }
-
-  });
+  res.json({ status: 'ok', message: 'Backend running' });
 
 });
 
 
-// Fallback for all routes with detailed logging
+// React fallback
 
 app.get('*', (req, res) => {
 
-  console.log(`Wildcard request for ${req.path} - Method: ${req.method}, URL: ${req.url}, Headers: ${JSON.stringify(req.headers)}`);
-
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'), (err) => {
-
-    if (err) {
-
-      console.error('Error serving index.html:', err);
-
-      res.status(500).send('Server error');
-
-    }
-
-  });
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 
 });
 
@@ -59,8 +35,5 @@ app.listen(port, () => {
 
   console.log(`Server running on http://localhost:${port}`);
 
-}).on('error', (err) => {
-
-  console.error('Server error:', err.message);
-
 });
+

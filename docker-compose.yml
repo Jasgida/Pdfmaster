@@ -1,14 +1,11 @@
-version: '3.8'
+version: "3.8"
+
 
 services:
 
-  web:
+  pdfmaster:
 
-    build:
-
-      context: .
-
-      dockerfile: Dockerfile
+    build: .
 
     ports:
 
@@ -21,3 +18,4 @@ services:
     environment:
 
       - NODE_ENV=production
+
