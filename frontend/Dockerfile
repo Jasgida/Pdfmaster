@@ -1,27 +1,32 @@
-# Frontend Dockerfile (Vite + React)
+# frontend/Dockerfile
 
-FROM node:18 AS build
+FROM node:20-alpine
 
 
 WORKDIR /app
+
+
+# Copy package files and install dependencies
 
 COPY package*.json ./
 
 RUN npm install
 
+
+# Copy all frontend source
+
 COPY . .
+
+
+# Build the frontend
 
 RUN npm run build
 
 
-# Nginx to serve static files
-
-FROM nginx:alpine
-
-COPY --from=build /app/dist /usr/share/nginx/html
-
+# Expose port (optional, since Nginx will serve)
 
 EXPOSE 3000
 
-CMD ["nginx", "-g", "daemon off;"]
+
+CMD ["npm", "run", "dev"]
 

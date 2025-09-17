@@ -3,71 +3,74 @@ version: "3.9"
 
 services:
 
-  frontend:
-
-    build:
-
-      context: ./frontend
-
-      dockerfile: Dockerfile
-
-    container_name: pdfmaster-frontend
-
-    restart: unless-stopped
-
-    ports:
-
-      - "3000:3000"
-
-    volumes:
-
-      - ./frontend:/app
-
-      - /app/node_modules
-
-    environment:
-
-      - NODE_ENV=production
-
-
   backend:
 
     build:
 
-      context: ./backend
+      context: .
 
-      dockerfile: Dockerfile
+      dockerfile: backend/Dockerfile
 
     container_name: pdfmaster-backend
 
-    restart: unless-stopped
+    env_file:
+
+      - backend/.env
 
     ports:
 
       - "5000:5000"
 
-    env_file:
+    volumes:
 
-      - ./backend/.env
+      - ./backend/uploads:/app/uploads
+
+    restart: unless-stopped
+
+
+  frontend:
+
+    build:
+
+      context: .
+
+      dockerfile: frontend/Dockerfile
+
+    container_name: pdfmaster-frontend
+
+    restart: unless-stopped
+
+
+  nginx:
+
+    image: nginx:alpine
+
+    container_name: pdfmaster-nginx
+
+    ports:
+
+      - "80:80"
 
     volumes:
 
-      - ./backend:/app
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
 
-      - ./uploads:/app/uploads
+      - ./dist:/usr/share/nginx/html
 
     depends_on:
 
-      - mongo
+      - backend
+
+      - frontend
+
+    restart: unless-stopped
 
 
   mongo:
 
-    image: mongo:5
+    image: mongo:6
 
     container_name: pdfmaster-mongo
-
-    restart: unless-stopped
 
     ports:
 
@@ -77,28 +80,7 @@ services:
 
       - mongo-data:/data/db
 
-
-  nginx:
-
-    image: nginx:alpine
-
-    container_name: pdfmaster-nginx
-
     restart: unless-stopped
-
-    ports:
-
-      - "80:80"
-
-    volumes:
-
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-
-    depends_on:
-
-      - frontend
-
-      - backend
 
 
 volumes:
