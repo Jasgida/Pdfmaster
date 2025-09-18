@@ -3,87 +3,89 @@ version: "3.9"
 
 services:
 
-  backend:
-
-    build:
-
-      context: .
-
-      dockerfile: backend/Dockerfile
-
-    container_name: pdfmaster-backend
-
-    env_file:
-
-      - backend/.env
-
-    ports:
-
-      - "5000:5000"
-
-    volumes:
-
-      - ./backend/uploads:/app/uploads
-
-    restart: unless-stopped
-
-
   frontend:
 
-    build:
-
-      context: .
-
-      dockerfile: frontend/Dockerfile
+    build: ./frontend
 
     container_name: pdfmaster-frontend
 
-    restart: unless-stopped
-
-
-  nginx:
-
-    image: nginx:alpine
-
-    container_name: pdfmaster-nginx
+    restart: always
 
     ports:
 
-      - "80:80"
-
-    volumes:
-
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-
-      - ./dist:/usr/share/nginx/html
+      - "3000:80" # external 3000 → container 80
 
     depends_on:
 
       - backend
 
-      - frontend
+    networks:
 
-    restart: unless-stopped
+      - pdfmaster-net
 
 
-  mongo:
+  backend:
 
-    image: mongo:6
+    build: ./backend
 
-    container_name: pdfmaster-mongo
+    container_name: pdfmaster-backend
+
+    restart: always
+
+    environment:
+
+      - FLASK_ENV=production
+
+    expose:
+
+      - "5000"
+
+    networks:
+
+      - pdfmaster-net
+
+
+  caddy:
+
+    image: caddy:latest
+
+    container_name: pdfmaster-caddy
+
+    restart: always
 
     ports:
 
-      - "27017:27017"
+      - "80:80"
+
+      - "443:443"
 
     volumes:
 
-      - mongo-data:/data/db
+      - ./Caddyfile:/etc/caddy/Caddyfile
 
-    restart: unless-stopped
+      - caddy_data:/data
+
+      - caddy_config:/config
+
+    depends_on:
+
+      - frontend
+
+      - backend
+
+    networks:
+
+      - pdfmaster-net
+
+
+networks:
+
+  pdfmaster-net:
 
 
 volumes:
 
-  mongo-data:
+  caddy_data:
+
+  caddy_config:
 

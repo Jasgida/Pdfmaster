@@ -1,6 +1,4 @@
-# backend/Dockerfile
-
-FROM python:3.12-slim
+FROM python:3.11-slim
 
 
 # Set working directory
@@ -8,14 +6,19 @@ FROM python:3.12-slim
 WORKDIR /app
 
 
-# Copy backend files
+# Copy requirements
 
-COPY backend/requirements.txt .
+COPY requirements.txt .
+
+
+# Install dependencies
 
 RUN pip install --no-cache-dir -r requirements.txt
 
 
-COPY backend/ .
+# Copy backend code
+
+COPY . .
 
 
 # Expose the backend port
@@ -23,7 +26,7 @@ COPY backend/ .
 EXPOSE 5000
 
 
-# Run Flask app
+# Start the app
 
 CMD ["python", "app.py"]
 

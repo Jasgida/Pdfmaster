@@ -1,0 +1,16 @@
+pdf-masters.com {
+
+    reverse_proxy frontend:80
+
+}
+
+
+# If you want API routed through /api/
+
+pdf-masters.com/api/* {
+
+    reverse_proxy backend:5000
+
+}
+
+

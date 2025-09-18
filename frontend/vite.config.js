@@ -13,6 +13,8 @@ export default defineConfig({
 
   },
 
+  base: "/",   // í ½í±ˆ add this
+
   define: {
 
     "process.env.NODE_ENV": JSON.stringify("production"),
