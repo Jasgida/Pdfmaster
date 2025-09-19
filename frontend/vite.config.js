@@ -13,7 +13,7 @@ export default defineConfig({
 
   },
 
-  base: "/",   // í ½í±ˆ add this
+  base: "/",   // í ½í±ˆ ADD THIS
 
   define: {
 

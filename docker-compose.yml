@@ -1,91 +1,55 @@
-version: "3.9"
+version: "3.8"
 
 
 services:
 
   frontend:
 
-    build: ./frontend
+    build:
+
+      context: ./frontend   # ./frontend is the build context
+
+      dockerfile: Dockerfile
 
     container_name: pdfmaster-frontend
 
-    restart: always
-
     ports:
 
-      - "3000:80" # external 3000 → container 80
+      - "3000:80"
 
-    depends_on:
-
-      - backend
+    restart: unless-stopped
 
     networks:
 
       - pdfmaster-net
 
 
-  backend:
+  # Uncomment this section if you want a backend later
 
-    build: ./backend
+  # backend:
 
-    container_name: pdfmaster-backend
+  #   build:
 
-    restart: always
+  #     context: ./backend
 
-    environment:
+  #     dockerfile: Dockerfile
 
-      - FLASK_ENV=production
+  #   container_name: pdfmaster-backend
 
-    expose:
+  #   ports:
 
-      - "5000"
+  #     - "5000:5000"
 
-    networks:
+  #   restart: unless-stopped
 
-      - pdfmaster-net
+  #   networks:
 
-
-  caddy:
-
-    image: caddy:latest
-
-    container_name: pdfmaster-caddy
-
-    restart: always
-
-    ports:
-
-      - "80:80"
-
-      - "443:443"
-
-    volumes:
-
-      - ./Caddyfile:/etc/caddy/Caddyfile
-
-      - caddy_data:/data
-
-      - caddy_config:/config
-
-    depends_on:
-
-      - frontend
-
-      - backend
-
-    networks:
-
-      - pdfmaster-net
+  #     - pdfmaster-net
 
 
 networks:
 
   pdfmaster-net:
 
-
-volumes:
-
-  caddy_data:
-
-  caddy_config:
+    driver: bridge
 

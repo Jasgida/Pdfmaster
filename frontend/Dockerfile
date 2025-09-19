@@ -1,6 +1,6 @@
-# Stage 1: build React app
+# Stage 1: Build frontend
 
-FROM node:18-alpine as build
+FROM node:20 AS build
 
 WORKDIR /app
 
@@ -13,11 +13,16 @@ COPY . .
 RUN npm run build
 
 
-# Stage 2: serve with nginx
+# Stage 2: Serve with Nginx
 
 FROM nginx:alpine
 
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/nginx.conf   # <-- correct path
 
-COPY --from=build /app/dist /usr/share/nginx/html
+COPY --from=build /app/build /usr/share/nginx/html
+
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
 
