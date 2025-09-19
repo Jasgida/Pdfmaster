@@ -7,7 +7,7 @@ services:
 
     build:
 
-      context: ./frontend   # ./frontend is the build context
+      context: ./frontend
 
       dockerfile: Dockerfile
 
@@ -24,27 +24,48 @@ services:
       - pdfmaster-net
 
 
-  # Uncomment this section if you want a backend later
+  backend:
 
-  # backend:
+    build:
 
-  #   build:
+      context: ./backend
 
-  #     context: ./backend
+      dockerfile: Dockerfile
 
-  #     dockerfile: Dockerfile
+    container_name: pdfmaster-backend
 
-  #   container_name: pdfmaster-backend
+    ports:
 
-  #   ports:
+      - "5000:5000"
 
-  #     - "5000:5000"
+    restart: unless-stopped
 
-  #   restart: unless-stopped
+    networks:
 
-  #   networks:
+      - pdfmaster-net
 
-  #     - pdfmaster-net
+    depends_on:
+
+      - mongo
+
+
+  mongo:
+
+    image: mongo:7.0
+
+    container_name: pdfmaster-mongo
+
+    ports:
+
+      - "27017:27017"
+
+    volumes:
+
+      - mongo-data:/data/db
+
+    networks:
+
+      - pdfmaster-net
 
 
 networks:
@@ -52,4 +73,9 @@ networks:
   pdfmaster-net:
 
     driver: bridge
+
+
+volumes:
+
+  mongo-data:
 
