@@ -1,78 +1,57 @@
 import { useState } from "react";
 
-import axios from "axios";
 
-
-function MergePdf() {
+export default function MergePdf() {
 
   const [files, setFiles] = useState([]);
 
-  const [loading, setLoading] = useState(false);
 
-
-  const handleUpload = async (e) => {
+  const handleSubmit = async (e) => {
 
     e.preventDefault();
 
-    if (!files.length) return alert("Please upload at least 2 PDFs");
+    if (files.length < 2) return alert("Select at least 2 PDFs.");
 
 
     const formData = new FormData();
 
-    for (let f of files) {
-
-      formData.append("files", f);
-
-    }
+    for (let f of files) formData.append("files", f);
 
 
-    setLoading(true);
+    const res = await fetch("/merge-pdf", { method: "POST", body: formData });
 
-    try {
+    const blob = await res.blob();
 
-      const res = await axios.post("http://localhost:5000/merge-pdf", formData, {
+    const url = window.URL.createObjectURL(blob);
 
-        responseType: "blob",
+    const a = document.createElement("a");
 
-      });
+    a.href = url;
 
+    a.download = "merged.pdf";
 
-      // download file
-
-      const url = window.URL.createObjectURL(new Blob([res.data]));
-
-      const link = document.createElement("a");
-
-      link.href = url;
-
-      link.setAttribute("download", "merged.pdf");
-
-      document.body.appendChild(link);
-
-      link.click();
-
-    } catch (err) {
-
-      console.error(err);
-
-      alert("Failed to merge PDFs");
-
-    } finally {
-
-      setLoading(false);
-
-    }
+    a.click();
 
   };
 
 
   return (
 
-    <div className="max-w-xl mx-auto mt-10 bg-white p-6 rounded-lg shadow-md">
+    <div className="min-h-screen p-8 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
 
-      <h1 className="text-xl font-bold mb-4 text-indigo-700">Merge PDFs</h1>
+      <h2 className="text-3xl font-bold text-center text-wine dark:text-wine-dark mb-8">
 
-      <form onSubmit={handleUpload}>
+        Merge PDFs
+
+      </h2>
+
+      <form
+
+        onSubmit={handleSubmit}
+
+        className="max-w-xl mx-auto p-6 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-md"
+
+      >
 
         <input
 
@@ -82,9 +61,9 @@ function MergePdf() {
 
           multiple
 
-          onChange={(e) => setFiles([...e.target.files])}
+          onChange={(e) => setFiles(e.target.files)}
 
-          className="block w-full mb-4"
+          className="w-full mb-4 p-2 border rounded-lg dark:bg-gray-700"
 
         />
 
@@ -92,13 +71,11 @@ function MergePdf() {
 
           type="submit"
 
-          disabled={loading}
-
-          className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+          className="w-full py-2 bg-wine hover:bg-wine-dark text-white rounded-lg"
 
         >
 
-          {loading ? "Merging..." : "Merge"}
+          Merge
 
         </button>
 
@@ -109,7 +86,4 @@ function MergePdf() {
   );
 
 }
-
-
-export default MergePdf;
 

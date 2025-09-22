@@ -1,20 +1,16 @@
 import { useState } from "react";
 
-import axios from "axios";
 
-
-function PdfToWord() {
+export default function PdfToWord() {
 
   const [file, setFile] = useState(null);
 
-  const [loading, setLoading] = useState(false);
 
-
-  const handleUpload = async (e) => {
+  const handleSubmit = async (e) => {
 
     e.preventDefault();
 
-    if (!file) return alert("Please upload a PDF");
+    if (!file) return;
 
 
     const formData = new FormData();
@@ -22,48 +18,40 @@ function PdfToWord() {
     formData.append("file", file);
 
 
-    setLoading(true);
+    const res = await fetch("/pdf-to-word", { method: "POST", body: formData });
 
-    try {
+    const blob = await res.blob();
 
-      const res = await axios.post("http://localhost:5000/pdf-to-word", formData, {
+    const url = window.URL.createObjectURL(blob);
 
-        responseType: "blob",
+    const a = document.createElement("a");
 
-      });
+    a.href = url;
 
-      const url = window.URL.createObjectURL(new Blob([res.data]));
+    a.download = "converted.docx";
 
-      const link = document.createElement("a");
-
-      link.href = url;
-
-      link.setAttribute("download", "converted.docx");
-
-      document.body.appendChild(link);
-
-      link.click();
-
-    } catch (err) {
-
-      alert("Failed to convert PDF to Word");
-
-    } finally {
-
-      setLoading(false);
-
-    }
+    a.click();
 
   };
 
 
   return (
 
-    <div className="max-w-xl mx-auto mt-10 bg-white p-6 rounded-lg shadow-md">
+    <div className="min-h-screen p-8 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
 
-      <h1 className="text-xl font-bold mb-4 text-indigo-700">PDF → Word</h1>
+      <h2 className="text-3xl font-bold text-center text-wine dark:text-wine-dark mb-8">
 
-      <form onSubmit={handleUpload}>
+        PDF to Word
+
+      </h2>
+
+      <form
+
+        onSubmit={handleSubmit}
+
+        className="max-w-xl mx-auto p-6 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-md"
+
+      >
 
         <input
 
@@ -73,7 +61,7 @@ function PdfToWord() {
 
           onChange={(e) => setFile(e.target.files[0])}
 
-          className="block w-full mb-4"
+          className="w-full mb-4 p-2 border rounded-lg dark:bg-gray-700"
 
         />
 
@@ -81,13 +69,11 @@ function PdfToWord() {
 
           type="submit"
 
-          disabled={loading}
-
-          className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+          className="w-full py-2 bg-wine hover:bg-wine-dark text-white rounded-lg"
 
         >
 
-          {loading ? "Converting..." : "Convert"}
+          Convert
 
         </button>
 
@@ -98,7 +84,4 @@ function PdfToWord() {
   );
 
 }
-
-
-export default PdfToWord;
 
