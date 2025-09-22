@@ -1,49 +1,45 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 import axios from "axios";
 
 
 function MergePdf() {
 
-  const [file1, setFile1] = useState(null);
-
-  const [file2, setFile2] = useState(null);
+  const [files, setFiles] = useState([]);
 
   const [loading, setLoading] = useState(false);
 
 
-  const handleUpload = async () => {
+  const handleUpload = async (e) => {
 
-    if (!file1 || !file2) {
+    e.preventDefault();
 
-      alert("Please upload two PDF files.");
-
-      return;
-
-    }
+    if (!files.length) return alert("Please upload at least 2 PDFs");
 
 
     const formData = new FormData();
 
-    formData.append("file1", file1);
+    for (let f of files) {
 
-    formData.append("file2", file2);
+      formData.append("files", f);
 
+    }
+
+
+    setLoading(true);
 
     try {
 
-      setLoading(true);
-
-      const response = await axios.post("http://localhost:5000/api/merge", formData, {
+      const res = await axios.post("http://localhost:5000/merge-pdf", formData, {
 
         responseType: "blob",
 
       });
 
 
-      // Automatic download
+      // download file
 
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const url = window.URL.createObjectURL(new Blob([res.data]));
 
       const link = document.createElement("a");
 
@@ -55,9 +51,9 @@ function MergePdf() {
 
       link.click();
 
-    } catch (error) {
+    } catch (err) {
 
-      console.error("Error merging PDFs:", error);
+      console.error(err);
 
       alert("Failed to merge PDFs");
 
@@ -72,27 +68,41 @@ function MergePdf() {
 
   return (
 
-    <div className="p-6 text-center">
+    <div className="max-w-xl mx-auto mt-10 bg-white p-6 rounded-lg shadow-md">
 
-      <h1 className="text-2xl font-bold mb-4">Merge PDFs</h1>
+      <h1 className="text-xl font-bold mb-4 text-indigo-700">Merge PDFs</h1>
 
-      <input type="file" accept="application/pdf" onChange={(e) => setFile1(e.target.files[0])} />
+      <form onSubmit={handleUpload}>
 
-      <input type="file" accept="application/pdf" onChange={(e) => setFile2(e.target.files[0])} />
+        <input
 
-      <button
+          type="file"
 
-        onClick={handleUpload}
+          accept="application/pdf"
 
-        className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
+          multiple
 
-        disabled={loading}
+          onChange={(e) => setFiles([...e.target.files])}
 
-      >
+          className="block w-full mb-4"
 
-        {loading ? "Processing..." : "Merge"}
+        />
 
-      </button>
+        <button
+
+          type="submit"
+
+          disabled={loading}
+
+          className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+
+        >
+
+          {loading ? "Merging..." : "Merge"}
+
+        </button>
+
+      </form>
 
     </div>
 

@@ -1,36 +1,44 @@
-import React, { useState } from "react";
+import { useState } from "react";
+
+import axios from "axios";
 
 
-export default function Summarize() {
+function Summarize() {
 
   const [file, setFile] = useState(null);
+
+  const [loading, setLoading] = useState(false);
 
   const [summary, setSummary] = useState("");
 
 
-  const handleSubmit = async (e) => {
+  const handleUpload = async (e) => {
 
     e.preventDefault();
 
+    if (!file) return alert("Please upload a PDF");
+
+
     const formData = new FormData();
 
-    formData.append("pdf", file);
+    formData.append("file", file);
 
 
-    const res = await fetch("http://localhost:5000/summarize", {
+    setLoading(true);
 
-      method: "POST",
+    try {
 
-      body: formData,
+      const res = await axios.post("http://localhost:5000/summarize", formData);
 
-    });
+      setSummary(res.data.summary || "No summary generated.");
 
+    } catch (err) {
 
-    if (res.ok) {
+      alert("Failed to summarize PDF");
 
-      const data = await res.json();
+    } finally {
 
-      setSummary(data.summary);
+      setLoading(false);
 
     }
 
@@ -39,11 +47,11 @@ export default function Summarize() {
 
   return (
 
-    <div className="max-w-xl mx-auto py-12 text-center">
+    <div className="max-w-xl mx-auto mt-10 bg-white p-6 rounded-lg shadow-md">
 
-      <h2 className="text-2xl font-bold mb-4">Summarize PDF</h2>
+      <h1 className="text-xl font-bold mb-4 text-indigo-700">Summarize & Chat</h1>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleUpload}>
 
         <input
 
@@ -53,13 +61,21 @@ export default function Summarize() {
 
           onChange={(e) => setFile(e.target.files[0])}
 
-          className="mb-4"
+          className="block w-full mb-4"
 
         />
 
-        <button className="bg-wine text-white px-6 py-2 rounded">
+        <button
 
-          Summarize
+          type="submit"
+
+          disabled={loading}
+
+          className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+
+        >
+
+          {loading ? "Summarizing..." : "Summarize"}
 
         </button>
 
@@ -67,9 +83,9 @@ export default function Summarize() {
 
       {summary && (
 
-        <div className="mt-6 p-4 bg-gray-100 dark:bg-gray-800 rounded">
+        <div className="mt-4 p-4 bg-gray-100 rounded">
 
-          <h3 className="font-semibold mb-2">Summary:</h3>
+          <h2 className="font-semibold mb-2">Summary:</h2>
 
           <p>{summary}</p>
 
@@ -82,4 +98,7 @@ export default function Summarize() {
   );
 
 }
+
+
+export default Summarize;
 

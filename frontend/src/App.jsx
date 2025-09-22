@@ -1,74 +1,62 @@
-import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import axios from "axios";
+import Navbar from "./components/Navbar";
+
+import Home from "./pages/Home";
+
+import MergePdf from "./pages/MergePdf";
+
+import SplitPdf from "./pages/SplitPdf";
+
+import CompressPdf from "./pages/CompressPdf";
+
+import WordToPdf from "./pages/WordToPdf";
+
+import PdfToWord from "./pages/PdfToWord";
+
+import Summarize from "./pages/Summarize";
 
 
-function MergePdf() {
-
-  const [files, setFiles] = useState([]);
-
-
-  const handleFileChange = (e) => setFiles(Array.from(e.target.files));
-
-
-  const handleUpload = async () => {
-
-    if (!files.length) return alert("Please upload at least one file");
-
-    const formData = new FormData();
-
-    files.forEach((file) => formData.append("pdfs", file));
-
-    try {
-
-      const response = await axios.post("https://pdf-masters.com/api/merge", formData, {
-
-        responseType: "blob",
-
-      });
-
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-
-      const link = document.createElement("a");
-
-      link.href = url;
-
-      link.setAttribute("download", "merged.pdf");
-
-      document.body.appendChild(link);
-
-      link.click();
-
-    } catch (err) {
-
-      console.error("Merge error:", err);
-
-      alert("Error merging PDFs: " + (err.response?.data?.error || err.message));
-
-    }
-
-  };
-
+function App() {
 
   return (
 
-    <div className="container mx-auto p-6 bg-white shadow-md rounded-lg max-w-2xl mx-auto">
+    <Router>
 
-      <h2 className="text-2xl font-bold text-wine mb-4">Merge PDFs</h2>
+      <div className="min-h-screen bg-gray-50">
 
-      <input type="file" multiple onChange={handleFileChange} className="mt-4 block w-full" />
+        <Navbar />
 
-      <button onClick={handleUpload} className="mt-4 bg-wine text-white px-4 py-2 rounded hover:bg-wine-dark">
+        <div className="container mx-auto px-4 py-6">
 
-        Upload & Merge
+          <Routes>
 
-      </button>
+            <Route path="/" element={<Home />} />
 
-    </div>
+            <Route path="/merge" element={<MergePdf />} />
+
+            <Route path="/split" element={<SplitPdf />} />
+
+            <Route path="/compress" element={<CompressPdf />} />
+
+            <Route path="/word-to-pdf" element={<WordToPdf />} />
+
+            <Route path="/pdf-to-word" element={<PdfToWord />} />
+
+            <Route path="/summarize" element={<Summarize />} />
+
+          </Routes>
+
+        </div>
+
+      </div>
+
+    </Router>
 
   );
 
 }
 
 
-export default MergePdf;
+export default App;
+

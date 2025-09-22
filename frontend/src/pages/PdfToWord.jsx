@@ -1,42 +1,56 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
-import API_URL from "../api";
+import axios from "axios";
 
 
-export default function PdfToWord() {
+function PdfToWord() {
 
   const [file, setFile] = useState(null);
 
+  const [loading, setLoading] = useState(false);
 
-  const handleUpload = async () => {
+
+  const handleUpload = async (e) => {
+
+    e.preventDefault();
+
+    if (!file) return alert("Please upload a PDF");
+
 
     const formData = new FormData();
 
     formData.append("file", file);
 
 
-    const res = await fetch(`${API_URL}/pdf-to-word`, {
+    setLoading(true);
 
-      method: "POST",
+    try {
 
-      body: formData,
+      const res = await axios.post("http://localhost:5000/pdf-to-word", formData, {
 
-    });
+        responseType: "blob",
 
+      });
 
-    if (res.ok) {
+      const url = window.URL.createObjectURL(new Blob([res.data]));
 
-      const blob = await res.blob();
+      const link = document.createElement("a");
 
-      const url = window.URL.createObjectURL(blob);
+      link.href = url;
 
-      const a = document.createElement("a");
+      link.setAttribute("download", "converted.docx");
 
-      a.href = url;
+      document.body.appendChild(link);
 
-      a.download = "converted.docx";
+      link.click();
 
-      a.click();
+    } catch (err) {
+
+      alert("Failed to convert PDF to Word");
+
+    } finally {
+
+      setLoading(false);
 
     }
 
@@ -45,27 +59,46 @@ export default function PdfToWord() {
 
   return (
 
-    <div className="p-6">
+    <div className="max-w-xl mx-auto mt-10 bg-white p-6 rounded-lg shadow-md">
 
-      <h2 className="text-xl font-bold mb-4">Convert PDF to Word</h2>
+      <h1 className="text-xl font-bold mb-4 text-indigo-700">PDF → Word</h1>
 
-      <input type="file" onChange={(e) => setFile(e.target.files[0])} />
+      <form onSubmit={handleUpload}>
 
-      <button
+        <input
 
-        className="bg-wine text-white px-4 py-2 rounded mt-4"
+          type="file"
 
-        onClick={handleUpload}
+          accept="application/pdf"
 
-      >
+          onChange={(e) => setFile(e.target.files[0])}
 
-        Convert
+          className="block w-full mb-4"
 
-      </button>
+        />
+
+        <button
+
+          type="submit"
+
+          disabled={loading}
+
+          className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+
+        >
+
+          {loading ? "Converting..." : "Convert"}
+
+        </button>
+
+      </form>
 
     </div>
 
   );
 
 }
+
+
+export default PdfToWord;
 

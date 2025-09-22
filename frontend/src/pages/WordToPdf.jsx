@@ -1,47 +1,56 @@
-// src/pages/WordToPdf.jsx
+import { useState } from "react";
 
-import React, { useState } from "react";
+import axios from "axios";
 
 
-export default function WordToPdf() {
+function WordToPdf() {
 
   const [file, setFile] = useState(null);
 
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
+
+  const handleUpload = async (e) => {
 
     e.preventDefault();
 
-    if (!file) return;
+    if (!file) return alert("Please upload a Word file");
 
 
     const formData = new FormData();
 
-    formData.append("word", file);
+    formData.append("file", file);
 
 
-    const res = await fetch("http://localhost:5000/word-to-pdf", {
+    setLoading(true);
 
-      method: "POST",
+    try {
 
-      body: formData,
+      const res = await axios.post("http://localhost:5000/word-to-pdf", formData, {
 
-    });
+        responseType: "blob",
 
+      });
 
-    if (res.ok) {
+      const url = window.URL.createObjectURL(new Blob([res.data]));
 
-      const blob = await res.blob();
+      const link = document.createElement("a");
 
-      const url = window.URL.createObjectURL(blob);
+      link.href = url;
 
-      const a = document.createElement("a");
+      link.setAttribute("download", "converted.pdf");
 
-      a.href = url;
+      document.body.appendChild(link);
 
-      a.download = "converted.pdf";
+      link.click();
 
-      a.click();
+    } catch (err) {
+
+      alert("Failed to convert Word to PDF");
+
+    } finally {
+
+      setLoading(false);
 
     }
 
@@ -50,11 +59,11 @@ export default function WordToPdf() {
 
   return (
 
-    <div className="max-w-xl mx-auto py-12 text-center">
+    <div className="max-w-xl mx-auto mt-10 bg-white p-6 rounded-lg shadow-md">
 
-      <h2 className="text-2xl font-bold mb-4">Convert Word to PDF</h2>
+      <h1 className="text-xl font-bold mb-4 text-indigo-700">Word → PDF</h1>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleUpload}>
 
         <input
 
@@ -64,7 +73,7 @@ export default function WordToPdf() {
 
           onChange={(e) => setFile(e.target.files[0])}
 
-          className="block mx-auto"
+          className="block w-full mb-4"
 
         />
 
@@ -72,11 +81,13 @@ export default function WordToPdf() {
 
           type="submit"
 
-          className="bg-wine text-white px-6 py-2 rounded shadow-md hover:bg-wine/80 transition"
+          disabled={loading}
+
+          className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
 
         >
 
-          Convert & Download
+          {loading ? "Converting..." : "Convert"}
 
         </button>
 
@@ -87,4 +98,7 @@ export default function WordToPdf() {
   );
 
 }
+
+
+export default WordToPdf;
 

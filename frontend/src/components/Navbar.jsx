@@ -1,23 +1,37 @@
-// src/components/Navbar.jsx
-
-import React from "react";
+import { Link } from "react-router-dom";
 
 
-export default function Navbar() {
+function Navbar() {
 
   return (
 
-    <nav className="bg-gray-100 dark:bg-gray-800 shadow px-6 py-4 flex justify-between items-center">
+    <nav className="bg-indigo-600 text-white shadow">
 
-      <h1 className="text-2xl font-bold text-wine">Pdfmaster</h1>
+      <div className="container mx-auto px-4 py-3 flex justify-between items-center">
 
-      <div className="space-x-4">
+        <Link to="/" className="text-xl font-bold tracking-wide">
 
-        <a href="#" className="text-gray-700 dark:text-gray-300 hover:text-wine">Home</a>
+          Pdfmaster
 
-        <a href="#" className="text-gray-700 dark:text-gray-300 hover:text-wine">Features</a>
+        </Link>
 
-        <a href="#" className="text-gray-700 dark:text-gray-300 hover:text-wine">About</a>
+        <div className="space-x-4">
+
+          <Link to="/" className="hover:text-gray-200">Home</Link>
+
+          <Link to="/merge" className="hover:text-gray-200">Merge</Link>
+
+          <Link to="/split" className="hover:text-gray-200">Split</Link>
+
+          <Link to="/compress" className="hover:text-gray-200">Compress</Link>
+
+          <Link to="/word-to-pdf" className="hover:text-gray-200">Word → PDF</Link>
+
+          <Link to="/pdf-to-word" className="hover:text-gray-200">PDF → Word</Link>
+
+          <Link to="/summarize" className="hover:text-gray-200">Summarize</Link>
+
+        </div>
 
       </div>
 
@@ -26,4 +40,7 @@ export default function Navbar() {
   );
 
 }
+
+
+export default Navbar;
 

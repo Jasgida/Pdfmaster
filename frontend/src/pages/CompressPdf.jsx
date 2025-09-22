@@ -1,12 +1,18 @@
-import React, { useState } from "react";
+import { useState } from "react";
+
+import axios from "axios";
 
 
-export default function CompressPdf() {
+function CompressPdf() {
 
   const [file, setFile] = useState(null);
 
+  const [loading, setLoading] = useState(false);
 
-  const handleCompress = async () => {
+
+  const handleUpload = async (e) => {
+
+    e.preventDefault();
 
     if (!file) return alert("Please upload a PDF");
 
@@ -16,72 +22,83 @@ export default function CompressPdf() {
     formData.append("file", file);
 
 
-    const response = await fetch("http://localhost:3000/compress-pdf", {
+    setLoading(true);
 
-      method: "POST",
+    try {
 
-      body: formData,
+      const res = await axios.post("http://localhost:5000/compress-pdf", formData, {
 
-    });
+        responseType: "blob",
 
+      });
 
-    if (!response.ok) {
+      const url = window.URL.createObjectURL(new Blob([res.data]));
 
-      alert("Error compressing PDF");
+      const link = document.createElement("a");
 
-      return;
+      link.href = url;
+
+      link.setAttribute("download", "compressed.pdf");
+
+      document.body.appendChild(link);
+
+      link.click();
+
+    } catch (err) {
+
+      alert("Failed to compress PDF");
+
+    } finally {
+
+      setLoading(false);
 
     }
-
-
-    const blob = await response.blob();
-
-    const url = window.URL.createObjectURL(blob);
-
-    const link = document.createElement("a");
-
-    link.href = url;
-
-    link.download = "compressed.pdf";
-
-    link.click();
 
   };
 
 
   return (
 
-    <div className="p-6 text-center">
+    <div className="max-w-xl mx-auto mt-10 bg-white p-6 rounded-lg shadow-md">
 
-      <h1 className="text-2xl font-bold mb-4">Compress PDF</h1>
+      <h1 className="text-xl font-bold mb-4 text-indigo-700">Compress PDF</h1>
 
-      <input
+      <form onSubmit={handleUpload}>
 
-        type="file"
+        <input
 
-        accept="application/pdf"
+          type="file"
 
-        onChange={(e) => setFile(e.target.files[0])}
+          accept="application/pdf"
 
-        className="mb-4"
+          onChange={(e) => setFile(e.target.files[0])}
 
-      />
+          className="block w-full mb-4"
 
-      <button
+        />
 
-        onClick={handleCompress}
+        <button
 
-        className="bg-purple-500 text-white px-4 py-2 rounded"
+          type="submit"
 
-      >
+          disabled={loading}
 
-        Compress
+          className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
 
-      </button>
+        >
+
+          {loading ? "Compressing..." : "Compress"}
+
+        </button>
+
+      </form>
 
     </div>
 
   );
 
 }
+
+
+export default CompressPdf;
 
