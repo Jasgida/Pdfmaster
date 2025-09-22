@@ -14,7 +14,9 @@ module.exports = {
 
       colors: {
 
-        wine: "#7B1E3A", // dark wine red
+        wine: "#7B1E3A",
+
+        "wine-dark": "#5A152B", // Darker shade
 
       },
 
@@ -25,4 +27,3 @@ module.exports = {
   plugins: [],
 
 };
-

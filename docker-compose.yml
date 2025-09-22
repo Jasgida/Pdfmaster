@@ -1,9 +1,8 @@
-version: "3.8"
-
-
 services:
 
   frontend:
+
+    image: pdfmaster-frontend
 
     build:
 
@@ -17,14 +16,16 @@ services:
 
       - "3000:80"
 
-    restart: unless-stopped
-
     networks:
 
       - pdfmaster-net
 
+    restart: unless-stopped
+
 
   backend:
+
+    image: pdfmaster-backend
 
     build:
 
@@ -38,15 +39,11 @@ services:
 
       - "5000:5000"
 
-    restart: unless-stopped
-
     networks:
 
       - pdfmaster-net
 
-    depends_on:
-
-      - mongo
+    restart: unless-stopped
 
 
   mongo:
@@ -61,11 +58,55 @@ services:
 
     volumes:
 
-      - mongo-data:/data/db
+      - mongo_data:/data/db
 
     networks:
 
       - pdfmaster-net
+
+    restart: unless-stopped
+
+
+  caddy:
+
+    image: caddy:2-alpine
+
+    container_name: pdfmaster-caddy
+
+    ports:
+
+      - "80:80"
+
+      - "443:443"
+
+    volumes:
+
+      - ./Caddyfile:/etc/caddy/Caddyfile
+
+      - caddy_data:/data
+
+      - caddy_config:/config
+
+    networks:
+
+      - pdfmaster-net
+
+    depends_on:
+
+      - frontend
+
+      - backend
+
+    restart: unless-stopped
+
+
+volumes:
+
+  mongo_data:
+
+  caddy_data:
+
+  caddy_config:
 
 
 networks:
@@ -73,9 +114,3 @@ networks:
   pdfmaster-net:
 
     driver: bridge
-
-
-volumes:
-
-  mongo-data:
-

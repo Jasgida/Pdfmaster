@@ -5,38 +5,27 @@ import axios from "axios";
 
 function MergePdf() {
 
-  const [file, setFile] = useState(null);
+  const [files, setFiles] = useState([]);
 
 
-  const handleFileChange = (e) => {
-
-    setFile(e.target.files[0]);
-
-  };
+  const handleFileChange = (e) => setFiles(Array.from(e.target.files));
 
 
   const handleUpload = async () => {
 
-    if (!file) return alert("Please upload a file");
-
+    if (!files.length) return alert("Please upload at least one file");
 
     const formData = new FormData();
 
-    formData.append("file", file);
-
+    files.forEach((file) => formData.append("pdfs", file));
 
     try {
 
-      // Use backend service name in Docker
-
-      const response = await axios.post("http://backend:5000/merge", formData, {
+      const response = await axios.post("https://pdf-masters.com/api/merge", formData, {
 
         responseType: "blob",
 
       });
-
-
-      // Trigger download
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
 
@@ -52,9 +41,9 @@ function MergePdf() {
 
     } catch (err) {
 
-      console.error(err);
+      console.error("Merge error:", err);
 
-      alert("Error merging PDF");
+      alert("Error merging PDFs: " + (err.response?.data?.error || err.message));
 
     }
 
@@ -63,13 +52,17 @@ function MergePdf() {
 
   return (
 
-    <div>
+    <div className="container mx-auto p-6 bg-white shadow-md rounded-lg max-w-2xl mx-auto">
 
-      <h2>Merge PDFs</h2>
+      <h2 className="text-2xl font-bold text-wine mb-4">Merge PDFs</h2>
 
-      <input type="file" onChange={handleFileChange} />
+      <input type="file" multiple onChange={handleFileChange} className="mt-4 block w-full" />
 
-      <button onClick={handleUpload}>Upload & Merge</button>
+      <button onClick={handleUpload} className="mt-4 bg-wine text-white px-4 py-2 rounded hover:bg-wine-dark">
+
+        Upload & Merge
+
+      </button>
 
     </div>
 
@@ -79,4 +72,3 @@ function MergePdf() {
 
 
 export default MergePdf;
-
