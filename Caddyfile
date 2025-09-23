@@ -1,7 +1,15 @@
-pdf-masters.com {
+https://pdf-masters.com {
+
+    
+
+    # Proxy API requests to backend
 
     reverse_proxy /api/* backend:5000
 
-    reverse_proxy frontend:80
+
+    # Proxy all other requests to frontend container
+
+    reverse_proxy /* frontend:80
 
 }
+

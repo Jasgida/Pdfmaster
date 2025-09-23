@@ -1,35 +1,9 @@
-import { useState, useEffect } from "react";
+import React from "react";
 
 import { Link } from "react-router-dom";
 
 
 export default function Home() {
-
-  const [darkMode, setDarkMode] = useState(
-
-    localStorage.getItem("theme") === "dark"
-
-  );
-
-
-  useEffect(() => {
-
-    if (darkMode) {
-
-      document.documentElement.classList.add("dark");
-
-      localStorage.setItem("theme", "dark");
-
-    } else {
-
-      document.documentElement.classList.remove("dark");
-
-      localStorage.setItem("theme", "light");
-
-    }
-
-  }, [darkMode]);
-
 
   const tools = [
 
@@ -41,79 +15,38 @@ export default function Home() {
 
     { name: "Compress PDF", path: "/compress" },
 
-    { name: "PDF to Word", path: "/pdf-to-word" },
+    { name: "PDF ‚Üí Word", path: "/pdf-to-word" },
 
-    { name: "Word to PDF", path: "/word-to-pdf" },
+    { name: "Word ‚Üí PDF", path: "/word-to-pdf" },
 
   ];
 
 
   return (
 
-    <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
-
-      {/* Navbar */}
-
-      <nav className="flex justify-between items-center p-6 shadow-sm bg-white dark:bg-gray-800">
-
-        <h1 className="text-2xl font-bold text-wine dark:text-wine-dark">
-
-          Pdf-Masters
-
-        </h1>
-
-        <div className="flex gap-6 text-gray-700 dark:text-gray-200 font-medium">
-
-          {tools.map((tool) => (
-
-            <Link key={tool.path} to={tool.path}>
-
-              {tool.name}
-
-            </Link>
-
-          ))}
-
-        </div>
-
-        {/* Dark Mode Toggle */}
-
-        <button
-
-          onClick={() => setDarkMode(!darkMode)}
-
-          className="ml-6 px-4 py-2 rounded-lg border bg-gray-200 dark:bg-gray-700 dark:border-gray-600"
-
-        >
-
-          {darkMode ? "‚òÄÔ∏è Light" : "Ì†ºÌºô Dark"}
-
-        </button>
-
-      </nav>
-
+    <div className="px-6 py-12 bg-gray-50 dark:bg-gray-900 min-h-screen">
 
       {/* Hero Section */}
 
-      <section className="text-center py-16">
+      <section className="text-center mb-16">
 
-        <h2 className="text-4xl font-bold mb-6 text-gray-900 dark:text-gray-100">
+        <h2 className="text-4xl font-bold text-[#7b0c17] dark:text-red-400 mb-4">
 
-          All-in-One PDF Toolkit
+          Welcome to Pdf-Masters
 
         </h2>
 
-        <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
+        <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
 
-          Convert, compress, split, merge, and summarize your PDFs with ease.
+          Your all-in-one PDF toolkit. Summarize, merge, split, compress, and convert PDFs effortlessly.
 
         </p>
 
         <Link
 
-          to="/merge"
+          to="/summarize"
 
-          className="px-6 py-3 bg-wine dark:bg-wine-dark text-white font-semibold rounded-lg shadow hover:opacity-90 transition"
+          className="px-6 py-3 bg-[#7b0c17] text-white font-semibold rounded-lg shadow hover:bg-[#a11a2a]"
 
         >
 
@@ -126,29 +59,29 @@ export default function Home() {
 
       {/* Tools Grid */}
 
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto px-6 pb-16">
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
 
-        {tools.map((tool) => (
+        {tools.map((tool, i) => (
 
           <Link
 
-            key={tool.path}
+            key={i}
 
             to={tool.path}
 
-            className="p-8 border rounded-2xl shadow-md hover:shadow-lg bg-gray-50 dark:bg-gray-800 transition"
+            className="p-6 rounded-xl shadow-md bg-white dark:bg-gray-800 hover:shadow-lg transition"
 
           >
 
-            <h3 className="text-xl font-semibold text-wine dark:text-wine-dark mb-3">
+            <h3 className="text-xl font-semibold text-[#7b0c17] dark:text-red-300 mb-2">
 
               {tool.name}
 
             </h3>
 
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-gray-600 dark:text-gray-400">
 
-              Quickly {tool.name.toLowerCase()}.
+              {`Quickly ${tool.name.toLowerCase()} with ease.`}
 
             </p>
 
