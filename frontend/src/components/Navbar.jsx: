@@ -1,0 +1,120 @@
+import React from "react";
+
+import { Link } from "react-router-dom";
+
+
+function Navbar() {
+
+  return (
+
+    <nav style={styles.navbar}>
+
+      {/* Logo - Click to go Home */}
+
+      <Link to="/" style={styles.logoLink}>
+
+        <img
+
+          src="/pf-logo.png"
+
+          alt="PDFMaster Logo"
+
+          style={styles.logo}
+
+        />
+
+        <span style={styles.logoText}>PDFMaster</span>
+
+      </Link>
+
+
+      {/* Navigation Links */}
+
+      <div style={styles.links}>
+
+        <Link to="/" style={styles.link}>Home</Link>
+
+        <Link to="/about" style={styles.link}>About</Link>
+
+        <Link to="/services" style={styles.link}>Services</Link>
+
+        <Link to="/contact" style={styles.link}>Contact</Link>
+
+      </div>
+
+    </nav>
+
+  );
+
+}
+
+
+const styles = {
+
+  navbar: {
+
+    display: "flex",
+
+    justifyContent: "space-between",
+
+    alignItems: "center",
+
+    padding: "10px 20px",
+
+    backgroundColor: "#f5f5f5",
+
+    borderBottom: "1px solid #ddd",
+
+  },
+
+  logoLink: {
+
+    display: "flex",
+
+    alignItems: "center",
+
+    textDecoration: "none",
+
+  },
+
+  logo: {
+
+    height: "40px",
+
+    marginRight: "10px",
+
+  },
+
+  logoText: {
+
+    fontSize: "20px",
+
+    fontWeight: "bold",
+
+    color: "#333",
+
+  },
+
+  links: {
+
+    display: "flex",
+
+    gap: "15px",
+
+  },
+
+  link: {
+
+    textDecoration: "none",
+
+    color: "#333",
+
+    fontWeight: "500",
+
+  },
+
+};
+
+
+export default Navbar;
+

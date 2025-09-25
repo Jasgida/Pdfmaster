@@ -1,116 +1,171 @@
 services:
 
+
   frontend:
+
 
     image: pdfmaster-frontend
 
+
     build:
+
 
       context: ./frontend
 
+
       dockerfile: Dockerfile
+
 
     container_name: pdfmaster-frontend
 
+
     ports:
+
 
       - "3000:80"
 
+
     networks:
+
 
       - pdfmaster-net
 
+
     restart: unless-stopped
+
 
 
   backend:
 
+
     image: pdfmaster-backend
+
 
     build:
 
+
       context: ./backend
+
 
       dockerfile: Dockerfile
 
+
     container_name: pdfmaster-backend
+
 
     ports:
 
+
       - "5000:5000"
+
 
     networks:
 
+
       - pdfmaster-net
 
+
     restart: unless-stopped
+
 
 
   mongo:
 
+
     image: mongo:7.0
+
 
     container_name: pdfmaster-mongo
 
+
     ports:
+
 
       - "27017:27017"
 
+
     volumes:
+
 
       - mongo_data:/data/db
 
+
     networks:
+
 
       - pdfmaster-net
 
+
     restart: unless-stopped
+
 
 
   caddy:
 
+
     image: caddy:2-alpine
+
 
     container_name: pdfmaster-caddy
 
+
     ports:
+
 
       - "80:80"
 
+
       - "443:443"
+
 
     volumes:
 
+
       - ./Caddyfile:/etc/caddy/Caddyfile
+
 
       - caddy_data:/data
 
+
       - caddy_config:/config
+
 
     networks:
 
+
       - pdfmaster-net
+
 
     depends_on:
 
+
       - frontend
 
+
       - backend
+
 
     restart: unless-stopped
 
 
+
 volumes:
+
 
   mongo_data:
 
+
   caddy_data:
+
 
   caddy_config:
 
 
+
 networks:
 
+
   pdfmaster-net:
+
 
     driver: bridge

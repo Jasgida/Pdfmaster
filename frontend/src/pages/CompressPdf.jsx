@@ -1,4 +1,6 @@
-import { useState } from "react";
+import React, { useState } from "react";
+
+import { compressPdf } from "../api";
 
 
 export default function CompressPdf() {
@@ -13,14 +15,7 @@ export default function CompressPdf() {
     if (!file) return;
 
 
-    const formData = new FormData();
-
-    formData.append("file", file);
-
-
-    const res = await fetch("/compress-pdf", { method: "POST", body: formData });
-
-    const blob = await res.blob();
+    const blob = await compressPdf(file);
 
     const url = window.URL.createObjectURL(blob);
 
@@ -37,43 +32,17 @@ export default function CompressPdf() {
 
   return (
 
-    <div className="min-h-screen p-8 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div className="p-6">
 
-      <h2 className="text-3xl font-bold text-center text-wine dark:text-wine-dark mb-8">
+      <h1 className="text-2xl font-bold mb-4 text-[#7b0c17]">Compress PDF</h1>
 
-        Compress PDF
+      <form onSubmit={handleSubmit} className="space-y-4">
 
-      </h2>
+        <input type="file" onChange={e => setFile(e.target.files[0])} />
 
-      <form
+        <button className="bg-[#4b0a0a] text-white px-4 py-2 rounded" type="submit">
 
-        onSubmit={handleSubmit}
-
-        className="max-w-xl mx-auto p-6 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-md"
-
-      >
-
-        <input
-
-          type="file"
-
-          accept="application/pdf"
-
-          onChange={(e) => setFile(e.target.files[0])}
-
-          className="w-full mb-4 p-2 border rounded-lg dark:bg-gray-700"
-
-        />
-
-        <button
-
-          type="submit"
-
-          className="w-full py-2 bg-wine hover:bg-wine-dark text-white rounded-lg"
-
-        >
-
-          Compress
+          Compress PDF
 
         </button>
 

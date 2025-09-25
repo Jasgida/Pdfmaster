@@ -1,11 +1,13 @@
+// frontend/src/pages/Home.jsx
+
 import React from "react";
 
 import { Link } from "react-router-dom";
 
 
-// ✅ Lucide icons (replaced FileWord & FileInput with FileDown & FileUp)
+// Lucide icons
 
-import { FileText, Copy, Scissors, Shrink, FileDown, FileUp } from "lucide-react";
+import { FileText, Copy, Scissors, Shrink, FileInput } from "lucide-react";
 
 
 export default function Home() {
@@ -20,9 +22,9 @@ export default function Home() {
 
     { name: "Compress PDF", path: "/compress", icon: <Shrink className="w-8 h-8 text-[#7b0c17] dark:text-red-300" /> },
 
-    { name: "PDF → Word", path: "/pdf-to-word", icon: <FileDown className="w-8 h-8 text-[#7b0c17] dark:text-red-300" /> },
+    { name: "PDF → Word", path: "/pdf-to-word", icon: <FileText className="w-8 h-8 text-[#7b0c17] dark:text-red-300" /> },
 
-    { name: "Word → PDF", path: "/word-to-pdf", icon: <FileUp className="w-8 h-8 text-[#7b0c17] dark:text-red-300" /> },
+    { name: "Word → PDF", path: "/word-to-pdf", icon: <FileInput className="w-8 h-8 text-[#7b0c17] dark:text-red-300" /> },
 
   ];
 
@@ -30,6 +32,7 @@ export default function Home() {
   return (
 
     <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
+
 
       {/* Hero Section */}
 
@@ -109,37 +112,17 @@ export default function Home() {
 
         <div className="container mx-auto px-6 flex flex-col sm:flex-row justify-between items-center">
 
-          {/* Brand */}
-
           <h1 className="text-lg font-bold">Pdf-Masters</h1>
-
-
-          {/* Links */}
 
           <div className="flex gap-6 mt-4 sm:mt-0 text-sm">
 
-            <Link to="/privacy" className="hover:underline">
+            <Link to="/privacy" className="hover:underline">Privacy Policy</Link>
 
-              Privacy Policy
+            <Link to="/terms" className="hover:underline">Terms of Service</Link>
 
-            </Link>
-
-            <Link to="/terms" className="hover:underline">
-
-              Terms of Service
-
-            </Link>
-
-            <Link to="/contact" className="hover:underline">
-
-              Contact
-
-            </Link>
+            <Link to="/contact" className="hover:underline">Contact</Link>
 
           </div>
-
-
-          {/* Copyright */}
 
           <p className="mt-4 sm:mt-0 text-sm text-gray-200">
 

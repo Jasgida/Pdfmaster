@@ -1,114 +1,70 @@
-import React, { useState } from "react";
+// frontend/src/App.jsx
 
-import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
+import React from "react";
+
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import Navbar from "./Navbar";
+
+
+// Pages
 
 import Home from "./pages/Home";
 
-import Summarize from "./pages/Summarize";
+import SplitPdf from "./pages/SplitPdf";
 
 import MergePdf from "./pages/MergePdf";
 
-import SplitPdf from "./pages/SplitPdf";
-
 import CompressPdf from "./pages/CompressPdf";
-
-import PdfToWord from "./pages/PdfToWord";
 
 import WordToPdf from "./pages/WordToPdf";
 
+import PdfToWord from "./pages/PdfToWord";
 
-function App() {
+import Summarize from "./pages/Summarize";
 
-  const [darkMode, setDarkMode] = useState(false);
+import Terms from "./pages/Terms";
 
+import Privacy from "./pages/Privacy";
+
+import Contact from "./pages/Contact";
+
+
+export default function App() {
 
   return (
 
     <Router>
 
-      <div className={darkMode ? "dark bg-gray-900 text-gray-100" : "bg-white text-gray-900"}>
+      <Navbar />
 
-        
+      <Routes>
 
-        {/* ‚úÖ Only one navbar now */}
+        <Route path="/" element={<Home />} />
 
-        <nav className="flex justify-between items-center px-6 py-4 shadow-md bg-[#7b0c17] dark:bg-[#4b0a0a]">
+        <Route path="/split" element={<SplitPdf />} />
 
-          {/* Brand */}
+        <Route path="/merge" element={<MergePdf />} />
 
-          <h1 className="text-2xl font-bold text-white">
+        <Route path="/compress" element={<CompressPdf />} />
 
-            Pdf-Masters
+        <Route path="/word-to-pdf" element={<WordToPdf />} />
 
-          </h1>
+        <Route path="/pdf-to-word" element={<PdfToWord />} />
 
+        <Route path="/summarize" element={<Summarize />} />
 
-          {/* Navigation Links */}
+        <Route path="/terms" element={<Terms />} />
 
-          <div className="flex gap-6 text-white font-medium">
+        <Route path="/privacy" element={<Privacy />} />
 
-            <Link to="/summarize">Summarize & Chat</Link>
+        <Route path="/contact" element={<Contact />} />
 
-            <Link to="/merge">Merge PDFs</Link>
-
-            <Link to="/split">Split PDF</Link>
-
-            <Link to="/compress">Compress</Link>
-
-            <Link to="/pdf-to-word">PDF ‚Üí Word</Link>
-
-            <Link to="/word-to-pdf">Word ‚Üí PDF</Link>
-
-          </div>
-
-
-          {/* Dark/Light Toggle */}
-
-          <button
-
-            onClick={() => setDarkMode(!darkMode)}
-
-            className="ml-6 px-4 py-2 rounded-lg border border-white bg-white text-[#7b0c17] 
-
-                       hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-300 dark:text-gray-200"
-
-          >
-
-            {darkMode ? "‚òÄÔ∏è Light" : "Ì†ºÌºô Dark"}
-
-          </button>
-
-        </nav>
-
-
-        {/* Pages */}
-
-        <Routes>
-
-          <Route path="/" element={<Home />} />
-
-          <Route path="/summarize" element={<Summarize />} />
-
-          <Route path="/merge" element={<MergePdf />} />
-
-          <Route path="/split" element={<SplitPdf />} />
-
-          <Route path="/compress" element={<CompressPdf />} />
-
-          <Route path="/pdf-to-word" element={<PdfToWord />} />
-
-          <Route path="/word-to-pdf" element={<WordToPdf />} />
-
-        </Routes>
-
-      </div>
+      </Routes>
 
     </Router>
 
   );
 
 }
-
-
-export default App;
 

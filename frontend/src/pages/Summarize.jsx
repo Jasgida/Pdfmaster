@@ -1,4 +1,6 @@
-import { useState } from "react";
+import React, { useState } from "react";
+
+import { summarizePdf } from "../api";
 
 
 export default function Summarize() {
@@ -15,57 +17,24 @@ export default function Summarize() {
     if (!file) return;
 
 
-    const formData = new FormData();
+    const data = await summarizePdf(file);
 
-    formData.append("file", file);
-
-
-    const res = await fetch("/summarize", { method: "POST", body: formData });
-
-    const data = await res.json();
-
-    setSummary(data.summary || "Error summarizing PDF.");
+    setSummary(data.summary || "No summary returned");
 
   };
 
 
   return (
 
-    <div className="min-h-screen p-8 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div className="p-6">
 
-      <h2 className="text-3xl font-bold text-center text-wine dark:text-wine-dark mb-8">
+      <h1 className="text-2xl font-bold mb-4 text-[#7b0c17]">Summarize PDF</h1>
 
-        Summarize & Chat
+      <form onSubmit={handleSubmit} className="space-y-4">
 
-      </h2>
+        <input type="file" onChange={e => setFile(e.target.files[0])} />
 
-      <form
-
-        onSubmit={handleSubmit}
-
-        className="max-w-xl mx-auto p-6 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-md"
-
-      >
-
-        <input
-
-          type="file"
-
-          accept="application/pdf"
-
-          onChange={(e) => setFile(e.target.files[0])}
-
-          className="w-full mb-4 p-2 border rounded-lg dark:bg-gray-700"
-
-        />
-
-        <button
-
-          type="submit"
-
-          className="w-full py-2 bg-wine hover:bg-wine-dark text-white rounded-lg"
-
-        >
+        <button className="bg-[#7b0c17] text-white px-4 py-2 rounded" type="submit">
 
           Summarize
 
@@ -73,17 +42,7 @@ export default function Summarize() {
 
       </form>
 
-      {summary && (
-
-        <div className="max-w-xl mx-auto mt-6 p-4 bg-gray-200 dark:bg-gray-700 rounded-lg">
-
-          <h3 className="font-semibold mb-2">Summary:</h3>
-
-          <p>{summary}</p>
-
-        </div>
-
-      )}
+      {summary && <div className="mt-4 p-4 bg-gray-100 dark:bg-gray-800 rounded">{summary}</div>}
 
     </div>
 

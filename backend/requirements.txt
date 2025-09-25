@@ -6,7 +6,7 @@ PyPDF2
 
 fpdf
 
-docx2pdf
+python-docx
 
 pdf2docx
 

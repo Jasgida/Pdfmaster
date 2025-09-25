@@ -1,5 +1,6 @@
 // server.js
 
+
 import express from "express";
 
 import multer from "multer";
@@ -13,7 +14,10 @@ import libre from "libreoffice-convert";
 
 const app = express();
 
-const PORT = 5000;
+
+// âš¡ Change port to 3000 to avoid conflict with backend
+
+const PORT = process.env.PORT || 3000;
 
 
 // File upload middleware
@@ -27,8 +31,6 @@ const upload = multer({ dest: "uploads/" });
 // Merge PDFs (placeholder)
 
 app.post("/merge", upload.array("pdfs"), (req, res) => {
-
-  // TODO: implement merging logic with pdf-lib or hummus
 
   res.send("Merging not implemented yet");
 
@@ -119,7 +121,7 @@ app.post("/pdf-to-word", upload.single("pdf"), (req, res) => {
 
 app.get("/", (req, res) => {
 
-  res.send("PDFMaster backend is running í ½íº€");
+  res.send("PDFMaster frontend server is running âœ…");
 
 });
 
@@ -128,7 +130,7 @@ app.get("/", (req, res) => {
 
 app.listen(PORT, () => {
 
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Frontend server running on http://localhost:${PORT}`);
 
 });
 

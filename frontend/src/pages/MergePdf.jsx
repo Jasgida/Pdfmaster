@@ -1,4 +1,6 @@
-import { useState } from "react";
+import React, { useState } from "react";
+
+import { mergePdfs } from "../api";
 
 
 export default function MergePdf() {
@@ -10,17 +12,10 @@ export default function MergePdf() {
 
     e.preventDefault();
 
-    if (files.length < 2) return alert("Select at least 2 PDFs.");
+    if (files.length === 0) return;
 
 
-    const formData = new FormData();
-
-    for (let f of files) formData.append("files", f);
-
-
-    const res = await fetch("/merge-pdf", { method: "POST", body: formData });
-
-    const blob = await res.blob();
+    const blob = await mergePdfs(Array.from(files));
 
     const url = window.URL.createObjectURL(blob);
 
@@ -37,45 +32,17 @@ export default function MergePdf() {
 
   return (
 
-    <div className="min-h-screen p-8 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div className="p-6">
 
-      <h2 className="text-3xl font-bold text-center text-wine dark:text-wine-dark mb-8">
+      <h1 className="text-2xl font-bold mb-4 text-[#7b0c17]">Merge PDFs</h1>
 
-        Merge PDFs
+      <form onSubmit={handleSubmit} className="space-y-4">
 
-      </h2>
+        <input type="file" multiple onChange={e => setFiles(e.target.files)} />
 
-      <form
+        <button className="bg-[#7b0c17] text-white px-4 py-2 rounded" type="submit">
 
-        onSubmit={handleSubmit}
-
-        className="max-w-xl mx-auto p-6 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-md"
-
-      >
-
-        <input
-
-          type="file"
-
-          accept="application/pdf"
-
-          multiple
-
-          onChange={(e) => setFiles(e.target.files)}
-
-          className="w-full mb-4 p-2 border rounded-lg dark:bg-gray-700"
-
-        />
-
-        <button
-
-          type="submit"
-
-          className="w-full py-2 bg-wine hover:bg-wine-dark text-white rounded-lg"
-
-        >
-
-          Merge
+          Merge PDFs
 
         </button>
 

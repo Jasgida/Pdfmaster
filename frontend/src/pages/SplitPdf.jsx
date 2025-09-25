@@ -1,9 +1,15 @@
-import { useState } from "react";
+import React, { useState } from "react";
+
+import { splitPdf } from "../api";
 
 
 export default function SplitPdf() {
 
   const [file, setFile] = useState(null);
+
+  const [startPage, setStartPage] = useState(1);
+
+  const [endPage, setEndPage] = useState(1);
 
 
   const handleSubmit = async (e) => {
@@ -13,14 +19,7 @@ export default function SplitPdf() {
     if (!file) return;
 
 
-    const formData = new FormData();
-
-    formData.append("file", file);
-
-
-    const res = await fetch("/split-pdf", { method: "POST", body: formData });
-
-    const blob = await res.blob();
+    const blob = await splitPdf(file, startPage, endPage);
 
     const url = window.URL.createObjectURL(blob);
 
@@ -28,7 +27,7 @@ export default function SplitPdf() {
 
     a.href = url;
 
-    a.download = "split.zip";
+    a.download = "split.pdf";
 
     a.click();
 
@@ -37,43 +36,49 @@ export default function SplitPdf() {
 
   return (
 
-    <div className="min-h-screen p-8 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div className="p-6">
 
-      <h2 className="text-3xl font-bold text-center text-wine dark:text-wine-dark mb-8">
+      <h1 className="text-2xl font-bold mb-4 text-[#7b0c17]">Split PDF</h1>
 
-        Split PDF
+      <form onSubmit={handleSubmit} className="space-y-4">
 
-      </h2>
+        <input type="file" onChange={e => setFile(e.target.files[0])} />
 
-      <form
+        <div className="flex space-x-2">
 
-        onSubmit={handleSubmit}
+          <input
 
-        className="max-w-xl mx-auto p-6 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-md"
+            type="number"
 
-      >
+            value={startPage}
 
-        <input
+            onChange={e => setStartPage(e.target.value)}
 
-          type="file"
+            placeholder="Start Page"
 
-          accept="application/pdf"
+            className="border p-2 rounded"
 
-          onChange={(e) => setFile(e.target.files[0])}
+          />
 
-          className="w-full mb-4 p-2 border rounded-lg dark:bg-gray-700"
+          <input
 
-        />
+            type="number"
 
-        <button
+            value={endPage}
 
-          type="submit"
+            onChange={e => setEndPage(e.target.value)}
 
-          className="w-full py-2 bg-wine hover:bg-wine-dark text-white rounded-lg"
+            placeholder="End Page"
 
-        >
+            className="border p-2 rounded"
 
-          Split
+          />
+
+        </div>
+
+        <button className="bg-[#7b0c17] text-white px-4 py-2 rounded" type="submit">
+
+          Split PDF
 
         </button>
 
