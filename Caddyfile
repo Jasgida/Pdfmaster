@@ -1,21 +1,21 @@
-https://pdf-masters.com {
+pdf-masters.com {
+
+    encode gzip
 
 
-    
+    # Proxy API calls to backend
+
+    reverse_proxy /api/* pdfmaster-backend:5000
 
 
-    # Proxy API requests to backend
+    # Serve frontend React app
+
+    reverse_proxy pdfmaster-frontend:80
 
 
-    reverse_proxy /api/* backend:5000
+    # Enable HTTPS with Let's Encrypt (replace with your real email)
 
-
-
-    # Proxy all other requests to frontend container
-
-
-    reverse_proxy /* frontend:80
-
+    tls chukwuemeka.on17@gmail.com
 
 }
 

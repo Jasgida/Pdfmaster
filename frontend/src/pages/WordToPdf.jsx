@@ -1,48 +1,99 @@
 import React, { useState } from "react";
 
-import { wordToPdf } from "../api";
-
 
 export default function WordToPdf() {
 
   const [file, setFile] = useState(null);
+
+  const [loading, setLoading] = useState(false);
 
 
   const handleSubmit = async (e) => {
 
     e.preventDefault();
 
-    if (!file) return;
+    if (!file) return alert("Select a Word (.docx) file");
 
 
-    const blob = await wordToPdf(file);
+    const formData = new FormData();
 
-    const url = window.URL.createObjectURL(blob);
+    formData.append("file", file);
 
-    const a = document.createElement("a");
 
-    a.href = url;
+    setLoading(true);
 
-    a.download = "converted.pdf";
+    try {
 
-    a.click();
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/word-to-pdf`, {
+
+        method: "POST",
+
+        body: formData,
+
+      });
+
+
+      if (!res.ok) throw new Error("Conversion failed");
+
+
+      const blob = await res.blob();
+
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+
+      a.href = url;
+
+      a.download = "converted.pdf";
+
+      document.body.appendChild(a);
+
+      a.click();
+
+      a.remove();
+
+    } catch (err) {
+
+      alert(err.message);
+
+    }
+
+    setLoading(false);
 
   };
 
 
   return (
 
-    <div className="p-6">
+    <div className="p-6 text-center">
 
-      <h1 className="text-2xl font-bold mb-4 text-[#7b0c17]">Word → PDF</h1>
+      <h1 className="text-2xl font-bold mb-4">Word → PDF</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
 
-        <input type="file" onChange={e => setFile(e.target.files[0])} />
+        <input
 
-        <button className="bg-[#7b0c17] text-white px-4 py-2 rounded" type="submit">
+          type="file"
 
-          Convert
+          accept=".doc,.docx"
+
+          onChange={(e) => setFile(e.target.files[0])}
+
+          className="block mx-auto"
+
+        />
+
+        <button
+
+          type="submit"
+
+          disabled={loading}
+
+          className="bg-red-900 text-white px-6 py-2 rounded hover:bg-red-700"
+
+        >
+
+          {loading ? "Processing..." : "Convert"}
 
         </button>
 

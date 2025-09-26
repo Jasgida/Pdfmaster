@@ -1,5 +1,3 @@
-// frontend/src/App.jsx
-
 import React from "react";
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
@@ -23,11 +21,11 @@ import PdfToWord from "./pages/PdfToWord";
 
 import Summarize from "./pages/Summarize";
 
-import Terms from "./pages/Terms";
+import Contact from "./pages/Contact";
 
 import Privacy from "./pages/Privacy";
 
-import Contact from "./pages/Contact";
+import Terms from "./pages/Terms";
 
 
 export default function App() {
@@ -36,31 +34,63 @@ export default function App() {
 
     <Router>
 
-      <Navbar />
+      <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
 
-      <Routes>
+        {/* Navbar stays on top */}
 
-        <Route path="/" element={<Home />} />
+        <Navbar />
 
-        <Route path="/split" element={<SplitPdf />} />
 
-        <Route path="/merge" element={<MergePdf />} />
+        {/* Main content */}
 
-        <Route path="/compress" element={<CompressPdf />} />
+        <main className="flex-grow container mx-auto px-4 py-6">
 
-        <Route path="/word-to-pdf" element={<WordToPdf />} />
+          <Routes>
 
-        <Route path="/pdf-to-word" element={<PdfToWord />} />
+            <Route path="/" element={<Home />} />
 
-        <Route path="/summarize" element={<Summarize />} />
+            <Route path="/split" element={<SplitPdf />} />
 
-        <Route path="/terms" element={<Terms />} />
+            <Route path="/merge" element={<MergePdf />} />
 
-        <Route path="/privacy" element={<Privacy />} />
+            <Route path="/compress" element={<CompressPdf />} />
 
-        <Route path="/contact" element={<Contact />} />
+            <Route path="/word-to-pdf" element={<WordToPdf />} />
 
-      </Routes>
+            <Route path="/pdf-to-word" element={<PdfToWord />} />
+
+            <Route path="/summarize" element={<Summarize />} />
+
+            <Route path="/contact" element={<Contact />} />
+
+            <Route path="/privacy" element={<Privacy />} />
+
+            <Route path="/terms" element={<Terms />} />
+
+          </Routes>
+
+        </main>
+
+
+        {/* Footer */}
+
+        <footer className="bg-red-900 text-white p-4 text-center">
+
+          <div className="flex flex-wrap justify-center space-x-6">
+
+            <a href="/contact" className="hover:text-yellow-400">Contact</a>
+
+            <a href="/privacy" className="hover:text-yellow-400">Privacy</a>
+
+            <a href="/terms" className="hover:text-yellow-400">Terms</a>
+
+          </div>
+
+          <p className="mt-2 text-sm">© {new Date().getFullYear()} Pdf-Masters</p>
+
+        </footer>
+
+      </div>
 
     </Router>
 

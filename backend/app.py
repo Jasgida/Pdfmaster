@@ -1,397 +1,273 @@
 import os
 
-
-import tempfile
-
-
-import zipfile
-
-
 from flask import Flask, request, jsonify, send_file
 
+from flask_cors import CORS
 
 from werkzeug.utils import secure_filename
 
-
 from PyPDF2 import PdfReader, PdfWriter
 
-
 from fpdf import FPDF
-
-
-import docx2pdf
-
 
 from pdf2docx import Converter
 
 
-
 app = Flask(__name__)
 
+CORS(app)
 
 
-UPLOAD_FOLDER = "uploads"
-
+UPLOAD_FOLDER = "data"
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
+# -----------------------
 
+# Compress PDF
 
+# -----------------------
 
-# ---------------------------
-
-
-# ✅ SUMMARIZE PDF
-
-
-# ---------------------------
-
-
-@app.route("/summarize", methods=["POST"])
-
-
-def summarize_pdf():
-
-
-    if "file" not in request.files:
-
-
-        return jsonify({"error": "No file uploaded"}), 400
-
-
-
-    file = request.files["file"]
-
-
-    if file.filename == "":
-
-
-        return jsonify({"error": "No selected file"}), 400
-
-
-
-    filepath = os.path.join(app.config["UPLOAD_FOLDER"], secure_filename(file.filename))
-
-
-    file.save(filepath)
-
-
-
-    # Extract text (basic)
-
-
-    reader = PdfReader(filepath)
-
-
-    text = ""
-
-
-    for page in reader.pages[:5]:  # limit to first 5 pages
-
-
-        text += page.extract_text() or ""
-
-
-
-    summary = text[:1000] + "..." if len(text) > 1000 else text  # naive summary
-
-
-
-    return jsonify({"summary": summary})
-
-
-
-
-# ---------------------------
-
-
-# ✅ MERGE PDF
-
-
-# ---------------------------
-
-
-@app.route("/merge-pdf", methods=["POST"])
-
-
-def merge_pdf():
-
-
-    files = request.files.getlist("files")
-
-
-    if len(files) < 2:
-
-
-        return jsonify({"error": "Upload at least 2 PDFs"}), 400
-
-
-
-    merger = PdfWriter()
-
-
-    for f in files:
-
-
-        filepath = os.path.join(app.config["UPLOAD_FOLDER"], secure_filename(f.filename))
-
-
-        f.save(filepath)
-
-
-        merger.append(filepath)
-
-
-
-    output_path = os.path.join(tempfile.gettempdir(), "merged.pdf")
-
-
-    with open(output_path, "wb") as out:
-
-
-        merger.write(out)
-
-
-
-    return send_file(output_path, as_attachment=True, download_name="merged.pdf")
-
-
-
-
-# ---------------------------
-
-
-# ✅ SPLIT PDF
-
-
-# ---------------------------
-
-
-@app.route("/split-pdf", methods=["POST"])
-
-
-def split_pdf():
-
-
-    if "file" not in request.files:
-
-
-        return jsonify({"error": "No file uploaded"}), 400
-
-
-
-    file = request.files["file"]
-
-
-    filepath = os.path.join(app.config["UPLOAD_FOLDER"], secure_filename(file.filename))
-
-
-    file.save(filepath)
-
-
-
-    reader = PdfReader(filepath)
-
-
-    zip_path = os.path.join(tempfile.gettempdir(), "split_pages.zip")
-
-
-
-    with zipfile.ZipFile(zip_path, "w") as zipf:
-
-
-        for i, page in enumerate(reader.pages):
-
-
-            writer = PdfWriter()
-
-
-            writer.add_page(page)
-
-
-
-            page_path = os.path.join(tempfile.gettempdir(), f"page_{i+1}.pdf")
-
-
-            with open(page_path, "wb") as f:
-
-
-                writer.write(f)
-
-
-
-            zipf.write(page_path, os.path.basename(page_path))
-
-
-
-    return send_file(zip_path, as_attachment=True, download_name="split_pages.zip")
-
-
-
-
-# ---------------------------
-
-
-# ✅ COMPRESS PDF (simple)
-
-
-# ---------------------------
-
-
-@app.route("/compress-pdf", methods=["POST"])
-
+@app.route("/api/compress-pdf", methods=["POST"])
 
 def compress_pdf():
 
-
     if "file" not in request.files:
-
 
         return jsonify({"error": "No file uploaded"}), 400
 
 
-
     file = request.files["file"]
 
+    filename = secure_filename(file.filename)
 
-    filepath = os.path.join(app.config["UPLOAD_FOLDER"], secure_filename(file.filename))
+    input_path = os.path.join(UPLOAD_FOLDER, filename)
 
+    output_path = os.path.join(UPLOAD_FOLDER, f"compressed_{filename}")
 
-    file.save(filepath)
-
-
-
-    # ⚠️ Basic compression = re-writing PDF
+    file.save(input_path)
 
 
-    reader = PdfReader(filepath)
-
+    reader = PdfReader(input_path)
 
     writer = PdfWriter()
 
-
-
     for page in reader.pages:
-
 
         writer.add_page(page)
 
 
-
-    output_path = os.path.join(tempfile.gettempdir(), "compressed.pdf")
-
-
     with open(output_path, "wb") as f:
-
 
         writer.write(f)
 
 
-
-    return send_file(output_path, as_attachment=True, download_name="compressed.pdf")
-
+    return send_file(output_path, as_attachment=True)
 
 
 
-# ---------------------------
+# -----------------------
+
+# Merge PDFs
+
+# -----------------------
+
+@app.route("/api/merge-pdf", methods=["POST"])
+
+def merge_pdf():
+
+    files = request.files.getlist("files")
+
+    if not files:
+
+        return jsonify({"error": "No files uploaded"}), 400
 
 
-# ✅ WORD → PDF
+    output_path = os.path.join(UPLOAD_FOLDER, "merged.pdf")
+
+    writer = PdfWriter()
 
 
-# ---------------------------
+    for file in files:
+
+        filename = secure_filename(file.filename)
+
+        input_path = os.path.join(UPLOAD_FOLDER, filename)
+
+        file.save(input_path)
+
+        reader = PdfReader(input_path)
+
+        for page in reader.pages:
+
+            writer.add_page(page)
 
 
-@app.route("/word-to-pdf", methods=["POST"])
+    with open(output_path, "wb") as f:
+
+        writer.write(f)
 
 
-def word_to_pdf():
+    return send_file(output_path, as_attachment=True)
 
 
-    if "file" not in request.files:
 
+# -----------------------
 
-        return jsonify({"error": "No file uploaded"}), 400
+# Split PDF
 
+# -----------------------
+
+@app.route("/api/split-pdf", methods=["POST"])
+
+def split_pdf():
+
+    if "file" not in request.files or "start" not in request.form or "end" not in request.form:
+
+        return jsonify({"error": "File, start, and end are required"}), 400
 
 
     file = request.files["file"]
 
+    start = int(request.form["start"])
 
-    filepath = os.path.join(app.config["UPLOAD_FOLDER"], secure_filename(file.filename))
-
-
-    file.save(filepath)
+    end = int(request.form["end"])
 
 
+    filename = secure_filename(file.filename)
 
-    output_path = os.path.join(tempfile.gettempdir(), "converted.pdf")
+    input_path = os.path.join(UPLOAD_FOLDER, filename)
 
+    output_path = os.path.join(UPLOAD_FOLDER, f"split_{filename}")
 
-    docx2pdf.convert(filepath, output_path)
-
-
-
-    return send_file(output_path, as_attachment=True, download_name="converted.pdf")
+    file.save(input_path)
 
 
+    reader = PdfReader(input_path)
+
+    writer = PdfWriter()
+
+    for i in range(start - 1, end):
+
+        writer.add_page(reader.pages[i])
 
 
-# ---------------------------
+    with open(output_path, "wb") as f:
+
+        writer.write(f)
 
 
-# ✅ PDF → WORD
+    return send_file(output_path, as_attachment=True)
 
 
-# ---------------------------
 
+# -----------------------
 
-@app.route("/pdf-to-word", methods=["POST"])
+# PDF to Word
 
+# -----------------------
+
+@app.route("/api/pdf-to-word", methods=["POST"])
 
 def pdf_to_word():
 
-
     if "file" not in request.files:
-
 
         return jsonify({"error": "No file uploaded"}), 400
 
 
-
     file = request.files["file"]
 
+    filename = secure_filename(file.filename)
 
-    filepath = os.path.join(app.config["UPLOAD_FOLDER"], secure_filename(file.filename))
+    input_path = os.path.join(UPLOAD_FOLDER, filename)
 
+    output_path = os.path.join(UPLOAD_FOLDER, f"{os.path.splitext(filename)[0]}.docx")
 
-    file.save(filepath)
-
-
-
-    output_path = os.path.join(tempfile.gettempdir(), "converted.docx")
+    file.save(input_path)
 
 
-    cv = Converter(filepath)
-
+    cv = Converter(input_path)
 
     cv.convert(output_path, start=0, end=None)
-
 
     cv.close()
 
 
+    return send_file(output_path, as_attachment=True)
 
-    return send_file(output_path, as_attachment=True, download_name="converted.docx")
 
+
+# -----------------------
+
+# Word to PDF
+
+# -----------------------
+
+@app.route("/api/word-to-pdf", methods=["POST"])
+
+def word_to_pdf():
+
+    if "file" not in request.files:
+
+        return jsonify({"error": "No file uploaded"}), 400
+
+
+    file = request.files["file"]
+
+    filename = secure_filename(file.filename)
+
+    input_path = os.path.join(UPLOAD_FOLDER, filename)
+
+    output_path = os.path.join(UPLOAD_FOLDER, f"{os.path.splitext(filename)[0]}.pdf")
+
+    file.save(input_path)
+
+
+    # NOTE: This is a simple text-to-PDF (not layout accurate).
+
+    pdf = FPDF()
+
+    pdf.add_page()
+
+    pdf.set_font("Arial", size=12)
+
+
+    try:
+
+        text = file.read().decode("utf-8", errors="ignore")
+
+        pdf.multi_cell(200, 10, text)
+
+    except Exception:
+
+        pdf.multi_cell(200, 10, "Unable to parse Word file content as text.")
+
+
+    pdf.output(output_path)
+
+
+    return send_file(output_path, as_attachment=True)
+
+
+
+# -----------------------
+
+# Health Check
+
+# -----------------------
+
+@app.route("/api/health", methods=["GET"])
+
+def health():
+
+    return jsonify({"status": "ok"})
 
 
 
 if __name__ == "__main__":
 
-
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000)
 

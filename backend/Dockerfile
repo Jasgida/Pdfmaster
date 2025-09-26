@@ -1,6 +1,10 @@
-# Use lightweight Python image
+# ------------------------------
 
-FROM python:3.11-slim
+# Backend Dockerfile
+
+# ------------------------------
+
+FROM python:3.11-slim-bookworm
 
 
 # Set working directory
@@ -8,18 +12,26 @@ FROM python:3.11-slim
 WORKDIR /app
 
 
-# Install system dependencies (needed for some PDF/Docx libs)
+# Install system dependencies (needed for PDF/Word processing)
 
 RUN apt-get update && apt-get install -y \
 
     libreoffice \
 
+    libreoffice-writer \
+
+    libreoffice-core \
+
     poppler-utils \
 
-    && rm -rf /var/lib/apt/lists/*
+    wget \
+
+    curl \
+
+ && rm -rf /var/lib/apt/lists/*
 
 
-# Copy requirements
+# Copy requirements first (for caching)
 
 COPY requirements.txt .
 

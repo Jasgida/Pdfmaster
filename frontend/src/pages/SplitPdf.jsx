@@ -1,84 +1,99 @@
 import React, { useState } from "react";
 
-import { splitPdf } from "../api";
-
 
 export default function SplitPdf() {
 
   const [file, setFile] = useState(null);
 
-  const [startPage, setStartPage] = useState(1);
-
-  const [endPage, setEndPage] = useState(1);
+  const [loading, setLoading] = useState(false);
 
 
   const handleSubmit = async (e) => {
 
     e.preventDefault();
 
-    if (!file) return;
+    if (!file) return alert("Select a PDF file");
 
 
-    const blob = await splitPdf(file, startPage, endPage);
+    const formData = new FormData();
 
-    const url = window.URL.createObjectURL(blob);
+    formData.append("file", file);
 
-    const a = document.createElement("a");
 
-    a.href = url;
+    setLoading(true);
 
-    a.download = "split.pdf";
+    try {
 
-    a.click();
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/split-pdf`, {
+
+        method: "POST",
+
+        body: formData,
+
+      });
+
+
+      if (!res.ok) throw new Error("Split failed");
+
+
+      const blob = await res.blob();
+
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+
+      a.href = url;
+
+      a.download = "split_pages.zip";
+
+      document.body.appendChild(a);
+
+      a.click();
+
+      a.remove();
+
+    } catch (err) {
+
+      alert(err.message);
+
+    }
+
+    setLoading(false);
 
   };
 
 
   return (
 
-    <div className="p-6">
+    <div className="p-6 text-center">
 
-      <h1 className="text-2xl font-bold mb-4 text-[#7b0c17]">Split PDF</h1>
+      <h1 className="text-2xl font-bold mb-4">Split PDF</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
 
-        <input type="file" onChange={e => setFile(e.target.files[0])} />
+        <input
 
-        <div className="flex space-x-2">
+          type="file"
 
-          <input
+          accept="application/pdf"
 
-            type="number"
+          onChange={(e) => setFile(e.target.files[0])}
 
-            value={startPage}
+          className="block mx-auto"
 
-            onChange={e => setStartPage(e.target.value)}
+        />
 
-            placeholder="Start Page"
+        <button
 
-            className="border p-2 rounded"
+          type="submit"
 
-          />
+          disabled={loading}
 
-          <input
+          className="bg-red-900 text-white px-6 py-2 rounded hover:bg-red-700"
 
-            type="number"
+        >
 
-            value={endPage}
-
-            onChange={e => setEndPage(e.target.value)}
-
-            placeholder="End Page"
-
-            className="border p-2 rounded"
-
-          />
-
-        </div>
-
-        <button className="bg-[#7b0c17] text-white px-4 py-2 rounded" type="submit">
-
-          Split PDF
+          {loading ? "Processing..." : "Split"}
 
         </button>
 

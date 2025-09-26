@@ -1,48 +1,99 @@
 import React, { useState } from "react";
 
-import { compressPdf } from "../api";
-
 
 export default function CompressPdf() {
 
   const [file, setFile] = useState(null);
+
+  const [loading, setLoading] = useState(false);
 
 
   const handleSubmit = async (e) => {
 
     e.preventDefault();
 
-    if (!file) return;
+    if (!file) return alert("Please select a PDF file");
 
 
-    const blob = await compressPdf(file);
+    const formData = new FormData();
 
-    const url = window.URL.createObjectURL(blob);
+    formData.append("file", file);
 
-    const a = document.createElement("a");
 
-    a.href = url;
+    setLoading(true);
 
-    a.download = "compressed.pdf";
+    try {
 
-    a.click();
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/compress-pdf`, {
+
+        method: "POST",
+
+        body: formData,
+
+      });
+
+
+      if (!res.ok) throw new Error("Compression failed");
+
+
+      const blob = await res.blob();
+
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+
+      a.href = url;
+
+      a.download = "compressed.pdf";
+
+      document.body.appendChild(a);
+
+      a.click();
+
+      a.remove();
+
+    } catch (err) {
+
+      alert(err.message);
+
+    }
+
+    setLoading(false);
 
   };
 
 
   return (
 
-    <div className="p-6">
+    <div className="p-6 text-center">
 
-      <h1 className="text-2xl font-bold mb-4 text-[#7b0c17]">Compress PDF</h1>
+      <h1 className="text-2xl font-bold mb-4">Compress PDF</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
 
-        <input type="file" onChange={e => setFile(e.target.files[0])} />
+        <input
 
-        <button className="bg-[#4b0a0a] text-white px-4 py-2 rounded" type="submit">
+          type="file"
 
-          Compress PDF
+          accept="application/pdf"
+
+          onChange={(e) => setFile(e.target.files[0])}
+
+          className="block mx-auto"
+
+        />
+
+        <button
+
+          type="submit"
+
+          disabled={loading}
+
+          className="bg-red-900 text-white px-6 py-2 rounded hover:bg-red-700"
+
+        >
+
+          {loading ? "Processing..." : "Compress"}
 
         </button>
 
