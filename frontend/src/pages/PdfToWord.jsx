@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 
+import { downloadFile } from "../utils/downloadHelper";
+
 
 export default function PdfToWord() {
 
@@ -12,7 +14,7 @@ export default function PdfToWord() {
 
     e.preventDefault();
 
-    if (!file) return alert("Select a PDF file");
+    if (!file) return alert("Please select a PDF file");
 
 
     const formData = new FormData();
@@ -22,41 +24,7 @@ export default function PdfToWord() {
 
     setLoading(true);
 
-    try {
-
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/pdf-to-word`, {
-
-        method: "POST",
-
-        body: formData,
-
-      });
-
-
-      if (!res.ok) throw new Error("Conversion failed");
-
-
-      const blob = await res.blob();
-
-      const url = window.URL.createObjectURL(blob);
-
-      const a = document.createElement("a");
-
-      a.href = url;
-
-      a.download = "converted.docx";
-
-      document.body.appendChild(a);
-
-      a.click();
-
-      a.remove();
-
-    } catch (err) {
-
-      alert(err.message);
-
-    }
+    await downloadFile("/pdf-to-word", formData);
 
     setLoading(false);
 

@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 
+import { downloadFile } from "../utils/downloadHelper";
+
 
 export default function MergePdf() {
 
@@ -12,51 +14,17 @@ export default function MergePdf() {
 
     e.preventDefault();
 
-    if (files.length < 2) return alert("Select at least 2 PDF files");
+    if (files.length < 2) return alert("Please select at least 2 PDF files");
 
 
     const formData = new FormData();
 
-    Array.from(files).forEach((f) => formData.append("files", f));
+    for (let f of files) formData.append("files", f);
 
 
     setLoading(true);
 
-    try {
-
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/merge-pdf`, {
-
-        method: "POST",
-
-        body: formData,
-
-      });
-
-
-      if (!res.ok) throw new Error("Merge failed");
-
-
-      const blob = await res.blob();
-
-      const url = window.URL.createObjectURL(blob);
-
-      const a = document.createElement("a");
-
-      a.href = url;
-
-      a.download = "merged.pdf";
-
-      document.body.appendChild(a);
-
-      a.click();
-
-      a.remove();
-
-    } catch (err) {
-
-      alert(err.message);
-
-    }
+    await downloadFile("/merge-pdf", formData);
 
     setLoading(false);
 
@@ -79,7 +47,7 @@ export default function MergePdf() {
 
           multiple
 
-          onChange={(e) => setFiles(e.target.files)}
+          onChange={(e) => setFiles([...e.target.files])}
 
           className="block mx-auto"
 

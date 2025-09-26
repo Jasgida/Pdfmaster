@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 
+import { downloadFile } from "../utils/downloadHelper";
+
 
 export default function CompressPdf() {
 
@@ -22,41 +24,7 @@ export default function CompressPdf() {
 
     setLoading(true);
 
-    try {
-
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/compress-pdf`, {
-
-        method: "POST",
-
-        body: formData,
-
-      });
-
-
-      if (!res.ok) throw new Error("Compression failed");
-
-
-      const blob = await res.blob();
-
-      const url = window.URL.createObjectURL(blob);
-
-      const a = document.createElement("a");
-
-      a.href = url;
-
-      a.download = "compressed.pdf";
-
-      document.body.appendChild(a);
-
-      a.click();
-
-      a.remove();
-
-    } catch (err) {
-
-      alert(err.message);
-
-    }
+    await downloadFile("/compress-pdf", formData);
 
     setLoading(false);
 

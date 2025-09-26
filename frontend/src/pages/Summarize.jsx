@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 
+import { downloadFile } from "../utils/downloadHelper";
+
 
 export default function Summarize() {
 
   const [file, setFile] = useState(null);
-
-  const [summary, setSummary] = useState("");
 
   const [loading, setLoading] = useState(false);
 
@@ -14,7 +14,7 @@ export default function Summarize() {
 
     e.preventDefault();
 
-    if (!file) return alert("Select a PDF file");
+    if (!file) return alert("Please select a PDF file");
 
 
     const formData = new FormData();
@@ -24,29 +24,7 @@ export default function Summarize() {
 
     setLoading(true);
 
-    try {
-
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/summarize`, {
-
-        method: "POST",
-
-        body: formData,
-
-      });
-
-
-      if (!res.ok) throw new Error("Summarization failed");
-
-
-      const data = await res.json();
-
-      setSummary(data.summary || "No summary returned");
-
-    } catch (err) {
-
-      alert(err.message);
-
-    }
+    await downloadFile("/summarize", formData);
 
     setLoading(false);
 
@@ -88,19 +66,6 @@ export default function Summarize() {
         </button>
 
       </form>
-
-
-      {summary && (
-
-        <div className="mt-6 p-4 bg-gray-100 dark:bg-gray-800 rounded text-left max-w-2xl mx-auto">
-
-          <h2 className="font-semibold mb-2">Summary:</h2>
-
-          <p className="whitespace-pre-wrap">{summary}</p>
-
-        </div>
-
-      )}
 
     </div>
 

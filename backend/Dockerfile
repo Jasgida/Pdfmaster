@@ -1,18 +1,8 @@
-# ------------------------------
-
-# Backend Dockerfile
-
-# ------------------------------
-
 FROM python:3.11-slim-bookworm
 
 
-# Set working directory
-
 WORKDIR /app
 
-
-# Install system dependencies (needed for PDF/Word processing)
 
 RUN apt-get update && apt-get install -y \
 
@@ -24,6 +14,8 @@ RUN apt-get update && apt-get install -y \
 
     poppler-utils \
 
+    ghostscript \
+
     wget \
 
     curl \
@@ -31,27 +23,15 @@ RUN apt-get update && apt-get install -y \
  && rm -rf /var/lib/apt/lists/*
 
 
-# Copy requirements first (for caching)
-
 COPY requirements.txt .
-
-
-# Install Python dependencies
 
 RUN pip install --no-cache-dir -r requirements.txt
 
 
-# Copy backend code
-
 COPY . .
 
 
-# Expose backend port
-
 EXPOSE 5000
-
-
-# Run Flask app
 
 CMD ["python", "app.py"]
 

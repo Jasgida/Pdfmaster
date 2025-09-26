@@ -1,9 +1,15 @@
 import React, { useState } from "react";
 
+import { downloadFile } from "../utils/downloadHelper";
+
 
 export default function SplitPdf() {
 
   const [file, setFile] = useState(null);
+
+  const [start, setStart] = useState("");
+
+  const [end, setEnd] = useState("");
 
   const [loading, setLoading] = useState(false);
 
@@ -12,51 +18,21 @@ export default function SplitPdf() {
 
     e.preventDefault();
 
-    if (!file) return alert("Select a PDF file");
+    if (!file || !start || !end) return alert("Provide file, start, and end pages");
 
 
     const formData = new FormData();
 
     formData.append("file", file);
 
+    formData.append("start", start);
+
+    formData.append("end", end);
+
 
     setLoading(true);
 
-    try {
-
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/split-pdf`, {
-
-        method: "POST",
-
-        body: formData,
-
-      });
-
-
-      if (!res.ok) throw new Error("Split failed");
-
-
-      const blob = await res.blob();
-
-      const url = window.URL.createObjectURL(blob);
-
-      const a = document.createElement("a");
-
-      a.href = url;
-
-      a.download = "split_pages.zip";
-
-      document.body.appendChild(a);
-
-      a.click();
-
-      a.remove();
-
-    } catch (err) {
-
-      alert(err.message);
-
-    }
+    await downloadFile("/split-pdf", formData);
 
     setLoading(false);
 
@@ -82,6 +58,38 @@ export default function SplitPdf() {
           className="block mx-auto"
 
         />
+
+        <div className="flex justify-center space-x-2">
+
+          <input
+
+            type="number"
+
+            placeholder="Start page"
+
+            value={start}
+
+            onChange={(e) => setStart(e.target.value)}
+
+            className="border px-2 py-1"
+
+          />
+
+          <input
+
+            type="number"
+
+            placeholder="End page"
+
+            value={end}
+
+            onChange={(e) => setEnd(e.target.value)}
+
+            className="border px-2 py-1"
+
+          />
+
+        </div>
 
         <button
 
